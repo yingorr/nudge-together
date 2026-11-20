@@ -22,10 +22,10 @@ export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false }
             </button>
           ))}
         </div>
-        <label className="switch-row small">
-          <input type="checkbox" checked={showDone} onChange={(e) => setShowDone(e.target.checked)} />
-          Show done ({doneCount}/{tasks.length})
-        </label>
+        <button className={`chip toggle ${showDone ? 'active' : ''}`} aria-pressed={showDone}
+          onClick={() => setShowDone(!showDone)}>
+          {showDone ? '✓ ' : ''}Done ({doneCount}/{tasks.length})
+        </button>
       </div>
 
       {visible.length === 0 ? (

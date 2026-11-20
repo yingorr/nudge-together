@@ -6,18 +6,17 @@ import Reminders from './Reminders'
 import Friends from './Friends'
 import FriendView from './FriendView'
 
-// Remember the "show friends" switch on this device.
-function useStoredToggle(key, initial) {
+// Remember which friend's tasks are shown ('' = hidden) on this device.
+function useStoredString(key, initial) {
   const [value, setValue] = useState(() => {
     try {
-      const v = localStorage.getItem(key)
-      return v === null ? initial : v === 'true'
+      return localStorage.getItem(key) ?? initial
     } catch {
       return initial
     }
   })
   useEffect(() => {
-    try { localStorage.setItem(key, String(value)) } catch { /* ignore */ }
+    try { localStorage.setItem(key, value) } catch { /* ignore */ }
   }, [key, value])
   return [value, setValue]
 }
@@ -28,9 +27,8 @@ export default function Home({ session }) {
   const [tasks, setTasks] = useState([])
   const [error, setError] = useState(null)
   const [tab, setTab] = useState('tasks') // 'tasks' | 'friends'
-  const [showFriends, setShowFriends] = useStoredToggle('nudge.showFriends', false)
   const [friends, setFriends] = useState([]) // accepted friend profiles
-  const [selectedFriend, setSelectedFriend] = useState('')
+  const [selectedFriend, setSelectedFriend] = useStoredString('nudge.friendView', '')
 
   const loadTasks = useCallback(async () => {
     const { data, error } = await supabase
@@ -121,27 +119,21 @@ export default function Home({ session }) {
           <TaskForm onAdd={addTask} />
           <TaskList tasks={tasks} onUpdate={updateTask} onDelete={deleteTask} />
 
-          <section className="card">
-            <label className="switch-row">
-              <input type="checkbox" checked={showFriends}
-                onChange={(e) => setShowFriends(e.target.checked)} />
-              Show friends' tasks
+          <section className="card stack">
+            <label className="friend-picker">
+              <span>Friends' tasks</span>
+              <select value={friendProfile ? selectedFriend : ''}
+                onChange={(e) => setSelectedFriend(e.target.value)}>
+                <option value="">Hidden</option>
+                {friends.map((f) => (
+                  <option key={f.id} value={f.id}>{f.display_name}</option>
+                ))}
+              </select>
             </label>
-            {showFriends && (
-              friends.length === 0 ? (
-                <p className="muted small">No friends yet — add some in the Friends tab.</p>
-              ) : (
-                <>
-                  <select value={selectedFriend} onChange={(e) => setSelectedFriend(e.target.value)}>
-                    <option value="">Choose a friend…</option>
-                    {friends.map((f) => (
-                      <option key={f.id} value={f.id}>{f.display_name}</option>
-                    ))}
-                  </select>
-                  {friendProfile && <FriendView friend={friendProfile} />}
-                </>
-              )
+            {friends.length === 0 && (
+              <p className="muted small">No friends yet — add some in the Friends tab.</p>
             )}
+            {friendProfile && <FriendView friend={friendProfile} />}
           </section>
         </main>
       )}
@@ -150,7 +142,7 @@ export default function Home({ session }) {
         <Friends
           userId={userId}
           loadFriends={loadFriends}
-          onViewFriend={(id) => { setShowFriends(true); setSelectedFriend(id); setTab('tasks') }}
+          onViewFriend={(id) => { setSelectedFriend(id); setTab('tasks') }}
         />
       )}
     </div>
