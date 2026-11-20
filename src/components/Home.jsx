@@ -4,22 +4,7 @@ import TaskForm from './TaskForm'
 import TaskList from './TaskList'
 import Reminders from './Reminders'
 import Friends from './Friends'
-import FriendView from './FriendView'
-
-// Remember which friend's tasks are shown ('' = hidden) on this device.
-function useStoredString(key, initial) {
-  const [value, setValue] = useState(() => {
-    try {
-      return localStorage.getItem(key) ?? initial
-    } catch {
-      return initial
-    }
-  })
-  useEffect(() => {
-    try { localStorage.setItem(key, value) } catch { /* ignore */ }
-  }, [key, value])
-  return [value, setValue]
-}
+import FriendsPanel from './FriendsPanel'
 
 export default function Home({ session }) {
   const userId = session.user.id
@@ -28,7 +13,7 @@ export default function Home({ session }) {
   const [error, setError] = useState(null)
   const [tab, setTab] = useState('tasks') // 'tasks' | 'friends'
   const [friends, setFriends] = useState([]) // accepted friend profiles
-  const [selectedFriend, setSelectedFriend] = useStoredString('nudge.friendView', '')
+  const [focusFriend, setFocusFriend] = useState(null) // { id } to open from the Friends tab
 
   const loadTasks = useCallback(async () => {
     const { data, error } = await supabase
@@ -92,7 +77,6 @@ export default function Home({ session }) {
     if (error) { setError(error.message); loadTasks() }
   }
 
-  const friendProfile = friends.find((f) => f.id === selectedFriend)
 
   return (
     <div className="app">
@@ -119,22 +103,7 @@ export default function Home({ session }) {
           <TaskForm onAdd={addTask} />
           <TaskList tasks={tasks} onUpdate={updateTask} onDelete={deleteTask} />
 
-          <section className="card stack">
-            <label className="friend-picker">
-              <span>Friends' tasks</span>
-              <select value={friendProfile ? selectedFriend : ''}
-                onChange={(e) => setSelectedFriend(e.target.value)}>
-                <option value="">Hidden</option>
-                {friends.map((f) => (
-                  <option key={f.id} value={f.id}>{f.display_name}</option>
-                ))}
-              </select>
-            </label>
-            {friends.length === 0 && (
-              <p className="muted small">No friends yet — add some in the Friends tab.</p>
-            )}
-            {friendProfile && <FriendView friend={friendProfile} />}
-          </section>
+          <FriendsPanel friends={friends} focusFriend={focusFriend} />
         </main>
       )}
 
@@ -142,7 +111,7 @@ export default function Home({ session }) {
         <Friends
           userId={userId}
           loadFriends={loadFriends}
-          onViewFriend={(id) => { setSelectedFriend(id); setTab('tasks') }}
+          onViewFriend={(id) => { setFocusFriend({ id }); setTab('tasks') }}
         />
       )}
     </div>

@@ -27,10 +27,7 @@ export default function FriendView({ friend }) {
 
   return (
     <div className="friend-view stack">
-      <div className="row between">
-        <strong>{friend.display_name}</strong>
-        <span className="muted small">{done} of {tasks.length} done</span>
-      </div>
+      <span className="muted small">{done} of {tasks.length} done</span>
       <div className="progress"><div style={{ width: `${pct}%` }} /></div>
       <TaskList tasks={tasks} readOnly />
     </div>
