@@ -5,6 +5,7 @@ import TaskList from './TaskList'
 import Reminders from './Reminders'
 import Friends from './Friends'
 import FriendsPanel from './FriendsPanel'
+import Pet from './Pet'
 
 export default function Home({ session }) {
   const userId = session.user.id
@@ -13,6 +14,13 @@ export default function Home({ session }) {
   const [error, setError] = useState(null)
   const [tab, setTab] = useState('tasks') // 'tasks' | 'friends'
   const [friends, setFriends] = useState([]) // accepted friend profiles
+  const [feedSignal, setFeedSignal] = useState(0) // bumps each time a task is completed
+  const [showPet, setShowPet] = useState(() => {
+    try { return localStorage.getItem('nudge.pet') !== 'false' } catch { return true }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('nudge.pet', String(showPet)) } catch { /* ignore */ }
+  }, [showPet])
   const [focusFriend, setFocusFriend] = useState(null) // { id } to open from the Friends tab
 
   const loadTasks = useCallback(async () => {
@@ -65,7 +73,8 @@ export default function Home({ session }) {
   }
 
   async function updateTask(id, changes) {
-    // Optimistic update so the checkbox feels instant.
+    if (changes.completed === true) setFeedSignal((n) => n + 1) // feed Mochi
+    // Optimistic update so the check feels instant.
     setTasks((ts) => ts.map((t) => (t.id === id ? { ...t, ...changes } : t)))
     const { error } = await supabase.from('tasks').update(changes).eq('id', id)
     if (error) { setError(error.message); loadTasks() }
@@ -78,12 +87,20 @@ export default function Home({ session }) {
   }
 
 
+  // Treats = tasks finished in the last 24 hours.
+  const dayAgo = Date.now() - 24 * 60 * 60 * 1000
+  const treatsToday = tasks.filter(
+    (t) => t.completed && t.completed_at && new Date(t.completed_at).getTime() > dayAgo
+  ).length
+
   return (
     <div className="app">
       <header className="topbar">
         <h1 className="logo">Nudge Together</h1>
         <div className="topbar-right">
           <span className="muted small">{profile?.display_name}</span>
+          <button className={`icon-btn pet-toggle ${showPet ? '' : 'off'}`} onClick={() => setShowPet(!showPet)}
+            aria-pressed={showPet} aria-label={showPet ? 'Hide the cat' : 'Show the cat'} title={showPet ? 'Hide the cat' : 'Show the cat'}>🐾</button>
           <button className="btn ghost small" onClick={() => supabase.auth.signOut()}>Log out</button>
         </div>
       </header>
@@ -114,6 +131,8 @@ export default function Home({ session }) {
           onViewFriend={(id) => { setFocusFriend({ id }); setTab('tasks') }}
         />
       )}
+
+      {showPet && <Pet treats={treatsToday} feedSignal={feedSignal} />}
     </div>
   )
 }
