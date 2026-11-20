@@ -15,7 +15,7 @@
   --error-text: #8a1c12;
   --tag-personal-bg: #e6eef0; --tag-personal: #2e5560;
   --tag-school-bg: #efe7f3;   --tag-school: #5b3a6b;
-  --tag-work-bg: #f5e9d6;     --tag-work: #7a4e16;
+  --tag-work-bg: #fde2cc;     --tag-work: #8a4513;  /* light orange */
   --due-soon: #8b1e2d;   /* maroon */
   --radius: 14px;
   color-scheme: light dark;
@@ -42,7 +42,7 @@
     --error-text: #fecaca;
     --tag-personal-bg: #1f3a40; --tag-personal: #bfe0e8;
     --tag-school-bg: #352a3d;   --tag-school: #e2cfee;
-    --tag-work-bg: #3f3220;     --tag-work: #f2d9a8;
+    --tag-work-bg: #4a2c1a;     --tag-work: #f8c9a0;
     --due-soon: #e8939b; /* light maroon, readable on dark */
   }
 }
