@@ -178,9 +178,9 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 /* ---------- Mochi the cat ---------- */
 .pet-area { position: fixed; left: 50%; transform: translateX(-50%); width: min(720px, 100%);
   bottom: calc(4px + env(safe-area-inset-bottom)); height: 84px; pointer-events: none; z-index: 5; }
-.pet { position: absolute; bottom: 0; width: 81px; height: 54px;
+.pet { position: absolute; bottom: 0; width: 72px; height: 54px;
   transition-property: left; transition-timing-function: linear; }
-.pet-btn { width: 81px; height: 54px; padding: 0; border: 0; background: none; cursor: pointer;
+.pet-btn { width: 72px; height: 54px; padding: 0; border: 0; background: none; cursor: pointer;
   pointer-events: auto; display: flex; align-items: flex-end; justify-content: flex-start; }
 /* keep the face in the same spot when switching poses */
 .pet.face-right .pet-btn { justify-content: flex-end; }

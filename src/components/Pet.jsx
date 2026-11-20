@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 // Mochi the cat: wanders along the bottom of the screen and eats a treat
 // every time you finish a task. Mood comes from tasks finished in the last 24h.
 
-const CAT_W = 81
+const CAT_W = 72
 // ---------- pixel art ----------
 // Each letter is one pixel. K outline, D/M/L grays, W white, P pink, Y eyes, N nose.
 const COLORS = {
@@ -11,47 +11,47 @@ const COLORS = {
   P: '#ee8f8a', Y: '#f2c94c', N: '#3a2f33',
 }
 
-// Walking: two frames (legs swap). Faces right. 27 x 18.
+// Walking: two frames (legs swap). Faces right. 24 x 18.
 // Sitting (resting, eating) and loaf (sleeping) face left, so they get flipped.
 const WALK_0 = [
-  '.................K.....K...',
-  '................KPK...KPK..',
-  '................KPMKKKMPK..',
-  '................KMDMDMDMK..',
-  '...............KMMMMMMMMMK.',
-  '...............KMMMMMMMMMK.',
-  '..............KKMMMWWWMMMKK',
-  '.....KKKKKKKKKKKKMWWNWWMK..',
-  '..KKKMDMMDMMDMMMMKKWWWKK...',
-  '..KKMMDMMDMMDMMMMMKWWWK....',
-  '.KDKMDMMDMMDMMDMMMMWWK.....',
-  '.KMKMMMMMMMMMMMMMMMWK......',
-  '.KDKKLLLLKKKKKKLLLLLK......',
-  '.KMK.KMKKDK....KDKMK.......',
-  '.KDK.KMKKDK....KDKMK.......',
-  '..KMKKMKKDK....KDKMK.......',
-  '...KKKMKKKK....KKKMK.......',
-  '.....KKK.........KKK.......',
+  '..............K.....K...',
+  '.............KPK...KPK..',
+  '.............KPMKKKMPK..',
+  '.............KMDMDMDMK..',
+  '............KMMMMMMMMMK.',
+  '............KMMMMMMMMMK.',
+  '...........KKMMMWWWMMMKK',
+  '.....KKKKKKKKKMWWNWWMK..',
+  '..KKKMDMMDMMMMKKWWWKK...',
+  '..KKMMDMMDMMMMMKWWWK....',
+  '.KDKMDMMDMMDMMMMWWK.....',
+  '.KMKMMMMMMMMMMMMWK......',
+  '.KDKKLLLKKKKLLLLLK......',
+  '.KMKKMKKDK..KDKMK.......',
+  '.KDKKMKKDK..KDKMK.......',
+  '..KMKMKKDK..KDKMK.......',
+  '...KKMKKKK..KKKMK.......',
+  '....KKK.......KKK.......',
 ]
 const WALK_1 = [
-  '.................K.....K...',
-  '................KPK...KPK..',
-  '................KPMKKKMPK..',
-  '................KMDMDMDMK..',
-  '...............KMMMMMMMMMK.',
-  '...............KMMMMMMMMMK.',
-  '..............KKMMMWWWMMMKK',
-  '.....KKKKKKKKKKKKMWWNWWMK..',
-  '..KKKMDMMDMMDMMMMKKWWWKK...',
-  '..KKMMDMMDMMDMMMMMKWWWK....',
-  '.KDKMDMMDMMDMMDMMMMWWK.....',
-  '.KMKMMMMMMMMMMMMMMMWK......',
-  '.KDKKLLLLKKKKKKLLLLLK......',
-  '.KMK..KMKK......KMK........',
-  '.KDK..KMKK......KMK........',
-  '..KMK.KMKK......KMK........',
-  '...KK.KMKK......KMK........',
-  '......KKK.......KKK........',
+  '..............K.....K...',
+  '.............KPK...KPK..',
+  '.............KPMKKKMPK..',
+  '.............KMDMDMDMK..',
+  '............KMMMMMMMMMK.',
+  '............KMMMMMMMMMK.',
+  '...........KKMMMWWWMMMKK',
+  '.....KKKKKKKKKMWWNWWMK..',
+  '..KKKMDMMDMMMMKKWWWKK...',
+  '..KKMMDMMDMMMMMKWWWK....',
+  '.KDKMDMMDMMDMMMMWWK.....',
+  '.KMKMMMMMMMMMMMMWK......',
+  '.KDKKLLLKKKKLLLLLK......',
+  '.KMK.KMKK....KMK........',
+  '.KDK.KMKK....KMK........',
+  '..KMKKMKK....KMK........',
+  '...KKKMKK....KMK........',
+  '.....KKK.....KKK........',
 ]
 const SIT = [
   '...K.....K........',
@@ -65,13 +65,13 @@ const SIT = [
   '...KKWWWKK....KK..',
   '..KMMWWWMMK..KMK..',
   '.KMDMWWWMDMK..KDK.',
-  '.KMMDWWWDMMK..KMK.',
-  '.KDMMWWWMMDK.KDK..',
-  'KMMDMWWWMDMMKKMK..',
-  'KMDMMWWWMMDMMDK...',
-  'KMMDMLWLMDMMMK....',
-  'KMKMMKLKMMKMK.....',
-  '.KKKKK.KKKKKK.....',
+  '.KMDKWWWKDMK..KMK.',
+  '.KDMKWWWKMDK.KDK..',
+  '.KMDKMKMKDMMKKMK..',
+  '.KDMKMKMKMDMMDK...',
+  '.KMDKMKMKDMMMK....',
+  '.KMMKWKWKMMMK.....',
+  '..KKKKKKKKKKK.....',
 ]
 const LOAF = [
   '..K.....K...........',
@@ -87,7 +87,7 @@ const LOAF = [
   '..KKKKKKKKKKKKKKK...',
 ]
 
-const WALK_EYES = [[17, 5, 'W'], [18, 5, 'K'], [17, 6, 'Y'], [18, 6, 'K'], [22, 5, 'W'], [23, 5, 'K'], [22, 6, 'Y'], [23, 6, 'K']]
+const WALK_EYES = [[14, 5, 'W'], [15, 5, 'K'], [14, 6, 'Y'], [15, 6, 'K'], [19, 5, 'W'], [20, 5, 'K'], [19, 6, 'Y'], [20, 6, 'K']]
 const SIT_EYES = {
   open: [[3, 4, 'W'], [4, 4, 'K'], [3, 5, 'Y'], [4, 5, 'K'], [7, 4, 'W'], [8, 4, 'K'], [7, 5, 'Y'], [8, 5, 'K']],
   happy: [[2, 5, 'K'], [3, 4, 'K'], [4, 4, 'K'], [5, 5, 'K'], [6, 5, 'K'], [7, 4, 'K'], [8, 4, 'K'], [9, 5, 'K']],
@@ -121,7 +121,7 @@ function Sprite({ cls, w, h, flip, children }) {
 function PixelCat({ facing, pose, eyes }) {
   if (pose === 'walk') {
     return (
-      <Sprite cls="walk" w={27} h={18} flip={facing}>
+      <Sprite cls="walk" w={24} h={18} flip={facing}>
         <g className="frame-0">{pixels(WALK_0, COLORS)}</g>
         <g className="frame-1">{pixels(WALK_1, COLORS)}</g>
         {eyeRects(WALK_EYES)}
@@ -223,7 +223,7 @@ export default function Pet({ treats, feedSignal }) {
     const fx = Math.max(10, Math.min(w - 34, Math.random() * (w - 44)))
     setFood(fx)
     // Stand so the mouth lands on the treat.
-    const standAt = fx > xRef.current ? fx - 48 : fx - 7
+    const standAt = fx > xRef.current ? fx - 39 : fx - 7
     later(() => {
       walkTo(standAt, () => {
         setFacing(fx > xRef.current + CAT_W / 2 ? 1 : -1)
