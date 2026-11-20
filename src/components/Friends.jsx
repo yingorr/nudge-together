@@ -3,7 +3,7 @@ import { supabase } from '../supabaseClient'
 
 export default function Friends({ userId, loadFriends, onViewFriend }) {
   const [rows, setRows] = useState([])
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [message, setMessage] = useState(null)
 
   async function refresh() {
@@ -16,12 +16,14 @@ export default function Friends({ userId, loadFriends, onViewFriend }) {
   async function sendRequest(e) {
     e.preventDefault()
     setMessage(null)
-    const clean = username.trim().toLowerCase().replace(/^@/, '')
+    const clean = email.trim().toLowerCase()
     if (!clean) return
 
-    const { data: target } = await supabase
-      .from('profiles').select('id, username').eq('username', clean).maybeSingle()
-    if (!target) return setMessage({ type: 'error', text: `No user called @${clean}.` })
+    // Private lookup: returns one match for this exact email, or nothing.
+    const { data, error: findError } = await supabase.rpc('find_profile_by_email', { p_email: clean })
+    if (findError) return setMessage({ type: 'error', text: findError.message })
+    const target = data?.[0]
+    if (!target) return setMessage({ type: 'error', text: `No Nudge Together account uses ${clean}.` })
     if (target.id === userId) return setMessage({ type: 'error', text: "That's you!" })
 
     const { error } = await supabase
@@ -32,8 +34,8 @@ export default function Friends({ userId, loadFriends, onViewFriend }) {
         text: error.code === '23505' ? 'You already have a request or friendship with them.' : error.message,
       })
     } else {
-      setMessage({ type: 'info', text: `Request sent to @${clean}.` })
-      setUsername('')
+      setMessage({ type: 'info', text: `Request sent to ${target.display_name}.` })
+      setEmail('')
       refresh()
     }
   }
@@ -59,8 +61,8 @@ export default function Friends({ userId, loadFriends, onViewFriend }) {
       <form className="card stack" onSubmit={sendRequest}>
         <strong>Add a friend</strong>
         <div className="row">
-          <input value={username} onChange={(e) => setUsername(e.target.value)}
-            placeholder="their username" autoCapitalize="none" />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+            placeholder="their email address" autoCapitalize="none" />
           <button className="btn primary">Send</button>
         </div>
         {message && <p className={`notice ${message.type}`}>{message.text}</p>}
@@ -71,7 +73,7 @@ export default function Friends({ userId, loadFriends, onViewFriend }) {
           <strong>Requests for you</strong>
           {incoming.map((f) => (
             <div key={f.id} className="row between">
-              <span>{other(f).display_name} <span className="muted">@{other(f).username}</span></span>
+              <span>{other(f).display_name}</span>
               <div className="row">
                 <button className="btn primary small" onClick={() => accept(f.id)}>Accept</button>
                 <button className="btn ghost small" onClick={() => remove(f.id, 'Decline this request?')}>Decline</button>
@@ -83,10 +85,10 @@ export default function Friends({ userId, loadFriends, onViewFriend }) {
 
       <section className="card stack">
         <strong>Friends ({accepted.length})</strong>
-        {accepted.length === 0 && <p className="muted small">No friends yet. Share your username so they can add you.</p>}
+        {accepted.length === 0 && <p className="muted small">No friends yet. Add them using the email they signed up with.</p>}
         {accepted.map((f) => (
           <div key={f.id} className="row between">
-            <span>{other(f).display_name} <span className="muted">@{other(f).username}</span></span>
+            <span>{other(f).display_name}</span>
             <div className="row">
               <button className="btn small" onClick={() => onViewFriend(other(f).id)}>View tasks</button>
               <button className="btn ghost small"
@@ -101,7 +103,7 @@ export default function Friends({ userId, loadFriends, onViewFriend }) {
           <strong>Waiting on</strong>
           {outgoing.map((f) => (
             <div key={f.id} className="row between">
-              <span className="muted">@{other(f).username}</span>
+             
               <button className="btn ghost small" onClick={() => remove(f.id, 'Cancel this request?')}>Cancel</button>
             </div>
           ))}

@@ -48,8 +48,8 @@ export default function Home({ session }) {
     const { data, error } = await supabase
       .from('friendships')
       .select(`id, status, requester_id, addressee_id,
-        requester:profiles!friendships_requester_id_fkey(id, username, display_name),
-        addressee:profiles!friendships_addressee_id_fkey(id, username, display_name)`)
+        requester:profiles!friendships_requester_id_fkey(id, display_name),
+        addressee:profiles!friendships_addressee_id_fkey(id, display_name)`)
     if (error) { setError(error.message); return [] }
     setFriends(
       data
@@ -101,7 +101,7 @@ export default function Home({ session }) {
       <header className="topbar">
         <h1 className="logo">Nudge Together</h1>
         <div className="topbar-right">
-          <span className="muted small">@{profile?.username}</span>
+          <span className="muted small">{profile?.display_name}</span>
           <button className="btn ghost small" onClick={() => supabase.auth.signOut()}>Log out</button>
         </div>
       </header>
@@ -135,7 +135,7 @@ export default function Home({ session }) {
                   <select value={selectedFriend} onChange={(e) => setSelectedFriend(e.target.value)}>
                     <option value="">Choose a friend…</option>
                     {friends.map((f) => (
-                      <option key={f.id} value={f.id}>{f.display_name} (@{f.username})</option>
+                      <option key={f.id} value={f.id}>{f.display_name}</option>
                     ))}
                   </select>
                   {friendProfile && <FriendView friend={friendProfile} />}
