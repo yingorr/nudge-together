@@ -160,6 +160,18 @@ create policy "remove friendship"
   on public.friendships for delete to authenticated
   using (auth.uid() in (requester_id, addressee_id));
 
+-- ---------- TABLE ACCESS --------------------------------------------
+-- Newer Supabase projects don't auto-grant table access; RLS above still
+-- limits which rows each user can see or change.
+grant usage on schema public to authenticated;
+
+grant select, update                 on public.profiles    to authenticated;
+grant select, insert, update, delete on public.tasks       to authenticated;
+grant select, insert, update, delete on public.friendships to authenticated;
+
+grant execute on function public.are_friends(uuid, uuid)        to authenticated;
+grant execute on function public.find_profile_by_email(text)    to authenticated;
+
 -- ---------- LIVE SYNC ---------------------------------------------------
 -- Lets the app hear about task changes instantly (e.g. checked off on phone,
 -- updates on laptop). Safe to re-run.
