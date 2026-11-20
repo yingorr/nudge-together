@@ -5,12 +5,43 @@ import { useEffect, useRef, useState } from 'react'
 
 const CAT_W = 69
 // ---------- pixel art ----------
-// Each letter is one pixel. K outline, D/M/L grays, W white, P pink, B blush, N nose.
+// Each letter is one pixel. K outline, D/M/L grays, W white, P pink, B blush, N nose, Y eyes.
 const COLORS = {
-  K: '#2b2a2e', D: '#5e5d63', M: '#8d8c92', L: '#b9b8bd', W: '#f3f0e8',
-  P: '#f08377', B: '#e9a3a0', N: '#d9616b',
+  K: '#262529', D: '#4d4c52', M: '#8a8990', L: '#a9a8ae', W: '#f1eee6',
+  P: '#ee8f8a', B: '#e9a3a0', N: '#d9616b', Y: '#f2c94c',
 }
-// 23 x 15 body, facing right. Legs are separate so they can step:
+// Sitting pose (resting, sleeping, eating). 18 x 22, faces the viewer, tail to the right.
+const SIT = [
+  '.K.......K........',
+  'KPK.....KPK.......',
+  'KPMKKKKKMPK.......',
+  'KMDMMDMMDMMK......',
+  'KMMDMMMMDMMK......',
+  'KMMMMMMMMMMK......',
+  'KMMMMMMMMMMK......',
+  'KBMMMNNMMMBK......',
+  '.KMMMWWMMMK.......',
+  '..KKMWWMKK........',
+  '..KMWWWDMK........',
+  '.KMWWWMDMMK.......',
+  '.KMWWWMMDMK....KK.',
+  '.KWWWWMDMMMK..KDK.',
+  'KMWWWWMMDDMK..KMK.',
+  'KMWWWWMDMMMMK.KDK.',
+  'KMWWWWMMDDMMK.KMK.',
+  'KMWWWMMDMMMDMKKDK.',
+  'KMWWWMMMDDMMDMMMK.',
+  'KWWWMMMDMMMMDMMK..',
+  'KWWKWWKMMDDMMMK...',
+  '.KK.KK.KKKKKKK....',
+]
+const SIT_EYES = {
+  open: [[2, 5, 'Y'], [3, 5, 'K'], [2, 6, 'Y'], [3, 6, 'K'], [7, 5, 'Y'], [8, 5, 'K'], [7, 6, 'Y'], [8, 6, 'K']],
+  closed: [[2, 6, 'K'], [3, 6, 'K'], [7, 6, 'K'], [8, 6, 'K']],
+  happy: [[1, 6, 'K'], [2, 5, 'K'], [3, 5, 'K'], [4, 6, 'K'], [6, 6, 'K'], [7, 5, 'K'], [8, 5, 'K'], [9, 6, 'K']],
+}
+
+// Walking pose. 23 x 15 body, facing right. Legs are separate so they can step:
 // far-side legs are darker, sit a pixel higher and tuck behind the body.
 const CAT = [
   '............KK.....KK..',
@@ -32,8 +63,7 @@ const CAT = [
 const NEAR_LEG = ['KMMK', 'KMMK', 'KWWK', 'KKKK']
 const FAR_LEG = ['KDDK', 'KDDK', 'KLLK', 'KKKK']
 const EYES = {
-  open: [[12, 6, 'K'], [13, 6, 'W'], [12, 7, 'K'], [13, 7, 'K'], [18, 6, 'K'], [19, 6, 'W'], [18, 7, 'K'], [19, 7, 'K']],
-  closed: [[12, 7, 'K'], [13, 7, 'K'], [18, 7, 'K'], [19, 7, 'K']],
+  open: [[12, 6, 'Y'], [13, 6, 'K'], [12, 7, 'Y'], [13, 7, 'K'], [18, 6, 'Y'], [19, 6, 'K'], [18, 7, 'Y'], [19, 7, 'K']],
   happy: [[11, 7, 'K'], [12, 6, 'K'], [13, 6, 'K'], [14, 7, 'K'], [17, 7, 'K'], [18, 6, 'K'], [19, 6, 'K'], [20, 7, 'K']],
 }
 const FISH = ['.KKKK..K', 'KLLLLKKL', 'KWLLLLLK', 'KLLLLKKL', '.KKKK..K']
@@ -51,9 +81,12 @@ function pixels(rows, colors, dx = 0, dy = 0, filter) {
 const isHead = (x, y) => x >= 10 && y <= 9
 const isTail = (x, y) => x <= 4 && y <= 8
 
-function PixelCat({ facing, eyes }) {
+const eyeRects = (list) =>
+  list.map(([x, y, c]) => <rect key={`e${x}-${y}`} x={x} y={y} width="1.02" height="1.02" fill={COLORS[c]} />)
+
+function WalkCat({ facing, eyes }) {
   return (
-    <svg viewBox="0 0 23 19" shapeRendering="crispEdges" style={{ transform: `scaleX(${facing})` }} aria-hidden="true">
+    <svg className="walk" viewBox="0 0 23 19" shapeRendering="crispEdges" style={{ transform: `scaleX(${facing})` }} aria-hidden="true">
       {/* far-side legs first, so the body covers their tops */}
       <g className="leg leg-b">{pixels(FAR_LEG, COLORS, 5, 14)}</g>
       <g className="leg leg-a">{pixels(FAR_LEG, COLORS, 15, 14)}</g>
@@ -62,13 +95,34 @@ function PixelCat({ facing, eyes }) {
         {pixels(CAT, COLORS, 0, 0, (x, y) => !isHead(x, y) && !isTail(x, y))}
         <g className="head">
           {pixels(CAT, COLORS, 0, 0, isHead)}
-          {EYES[eyes].map(([x, y, c]) => <rect key={`e${x}-${y}`} x={x} y={y} width="1.02" height="1.02" fill={COLORS[c]} />)}
+          {eyeRects(EYES[eyes === 'happy' ? 'happy' : 'open'])}
         </g>
       </g>
       <g className="leg leg-a">{pixels(NEAR_LEG, COLORS, 3, 15)}</g>
       <g className="leg leg-b">{pixels(NEAR_LEG, COLORS, 13, 15)}</g>
     </svg>
   )
+}
+
+const sitHead = (x, y) => y <= 8
+const sitTail = (x, y) => x >= 13 && y >= 12 && y <= 18
+
+// The sitting sprite looks left by default, so flip it the other way.
+function SitCat({ facing, eyes }) {
+  return (
+    <svg className="sit" viewBox="0 0 18 22" shapeRendering="crispEdges" style={{ transform: `scaleX(${-facing})` }} aria-hidden="true">
+      <g className="tail">{pixels(SIT, COLORS, 0, 0, sitTail)}</g>
+      {pixels(SIT, COLORS, 0, 0, (x, y) => !sitHead(x, y) && !sitTail(x, y))}
+      <g className="head">
+        {pixels(SIT, COLORS, 0, 0, sitHead)}
+        {eyeRects(SIT_EYES[eyes])}
+      </g>
+    </svg>
+  )
+}
+
+function PixelCat({ facing, eyes, walking }) {
+  return walking ? <WalkCat facing={facing} eyes={eyes} /> : <SitCat facing={facing} eyes={eyes} />
 }
 
 const reduceMotion = () =>
@@ -144,7 +198,7 @@ export default function Pet({ treats, feedSignal }) {
     const fx = Math.max(10, Math.min(w - 34, Math.random() * (w - 44)))
     setFood(fx)
     // Stand so the mouth lands on the treat.
-    const standAt = fx > xRef.current ? fx - 37 : fx - 6
+    const standAt = fx > xRef.current ? fx - 34 : fx - 8
     later(() => {
       walkTo(standAt, () => {
         setFacing(fx > xRef.current + CAT_W / 2 ? 1 : -1)
@@ -199,9 +253,12 @@ export default function Pet({ treats, feedSignal }) {
         )}
 
         <button className="pet-btn" onClick={poke} aria-label={`Mochi the cat, ${mood}. ${treats} treats today.`}>
-          <PixelCat facing={facing} eyes={asleep ? 'closed' : mood === 'happy' ? 'happy' : 'open'} />
+          <PixelCat facing={facing} walking={walking} eyes={asleep ? 'closed' : mood === 'happy' ? 'happy' : 'open'} />
         </button>
       </div>
     </div>
   )
 }
+
+// Exported for previews/tests.
+export { PixelCat }
