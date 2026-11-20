@@ -3,37 +3,38 @@ import { useEffect, useRef, useState } from 'react'
 // Mochi the cat: wanders along the bottom of the screen and eats a treat
 // every time you finish a task. Mood comes from tasks finished in the last 24h.
 
-const CAT_W = 74
+const CAT_W = 69
 // ---------- pixel art ----------
 // Each letter is one pixel. K outline, D/M/L grays, W white, P pink, B blush, N nose.
 const COLORS = {
   K: '#2b2a2e', D: '#5e5d63', M: '#8d8c92', L: '#b9b8bd', W: '#f3f0e8',
   P: '#f08377', B: '#e9a3a0', N: '#d9616b',
 }
-// 26 x 16 body, facing right. Legs are drawn separately so they can step.
+// 23 x 15 body, facing right. Legs are separate so they can step:
+// far-side legs are darker, sit a pixel higher and tuck behind the body.
 const CAT = [
-  '...............KK.....KK..',
-  '..............KMDK...KDMK.',
-  '..............KPMMKKKMMPK.',
-  '.............KPPMDMMDMMPPK',
-  '.............KMMDMMMMDMMMK',
-  '............KMMMMMMMMMMMMK',
-  '.KK.........KMMMMMMMMMMMMK',
-  'KMDK........KMMMMMMMMMMMMK',
-  'KDMK........KBMMMWWNWWMMBK',
-  'KMDK........KMMMWWWWWWMMK.',
-  '.KMDK........KKMMWWWWMMKK.',
-  '..KMDKKKKKKKKMMDKKWWWWK...',
-  '..KMMDMMDMMDMMDMKWWWWK....',
-  '..KMDMMDMMDMMDMMMWWWWK....',
-  '..KMMMMMMMMMMMMMMWWWK.....',
-  '...KLLLWWWWWWWLLLLLK......',
+  '............KK.....KK..',
+  '...........KMDK...KDMK.',
+  '...........KPMMKKKMMPK.',
+  '..........KPPMDMMDMMPPK',
+  '.KK.......KMMDMMMMDMMMK',
+  'KMDK.....KMMMMMMMMMMMMK',
+  'KDMK.....KMMMMMMMMMMMMK',
+  'KMDK.....KMMMMMMMMMMMMK',
+  '.KMDKKKKKKBMMMWWNWWMMBK',
+  '.KDMDMMDMMMMMWWWWWWMMK.',
+  '.KMMDMMDMMDMKKMWWWWMKK.',
+  '.KMDMMDMMDMMMKWWWWWK...',
+  '.KMMMDMMDMMMMMWWWWWK...',
+  '.KMMMMMMMMMMMMWWWWK....',
+  '..KLLLWWWWWWLLLLLK.....',
 ]
-const LEG = ['KMMK', 'KMMK', 'KWWK', 'KKKK']
+const NEAR_LEG = ['KMMK', 'KMMK', 'KWWK', 'KKKK']
+const FAR_LEG = ['KDDK', 'KDDK', 'KLLK', 'KKKK']
 const EYES = {
-  open: [[15, 6, 'K'], [16, 6, 'W'], [15, 7, 'K'], [16, 7, 'K'], [21, 6, 'K'], [22, 6, 'W'], [21, 7, 'K'], [22, 7, 'K']],
-  closed: [[15, 7, 'K'], [16, 7, 'K'], [21, 7, 'K'], [22, 7, 'K']],
-  happy: [[14, 7, 'K'], [15, 6, 'K'], [16, 6, 'K'], [17, 7, 'K'], [20, 7, 'K'], [21, 6, 'K'], [22, 6, 'K'], [23, 7, 'K']],
+  open: [[12, 6, 'K'], [13, 6, 'W'], [12, 7, 'K'], [13, 7, 'K'], [18, 6, 'K'], [19, 6, 'W'], [18, 7, 'K'], [19, 7, 'K']],
+  closed: [[12, 7, 'K'], [13, 7, 'K'], [18, 7, 'K'], [19, 7, 'K']],
+  happy: [[11, 7, 'K'], [12, 6, 'K'], [13, 6, 'K'], [14, 7, 'K'], [17, 7, 'K'], [18, 6, 'K'], [19, 6, 'K'], [20, 7, 'K']],
 }
 const FISH = ['.KKKK..K', 'KLLLLKKL', 'KWLLLLLK', 'KLLLLKKL', '.KKKK..K']
 const FISH_COLORS = { K: '#2f4a63', L: '#7fb0d6', W: '#1d2b36' }
@@ -47,17 +48,16 @@ function pixels(rows, colors, dx = 0, dy = 0, filter) {
   return out
 }
 
-const isHead = (x, y) => x >= 12 && y <= 10
-const isTail = (x, y) => x <= 4 && y <= 10
+const isHead = (x, y) => x >= 10 && y <= 9
+const isTail = (x, y) => x <= 4 && y <= 8
 
 function PixelCat({ facing, eyes }) {
   return (
-    <svg viewBox="0 0 26 20" shapeRendering="crispEdges" style={{ transform: `scaleX(${facing})` }} aria-hidden="true">
+    <svg viewBox="0 0 23 19" shapeRendering="crispEdges" style={{ transform: `scaleX(${facing})` }} aria-hidden="true">
+      {/* far-side legs first, so the body covers their tops */}
+      <g className="leg leg-b">{pixels(FAR_LEG, COLORS, 5, 14)}</g>
+      <g className="leg leg-a">{pixels(FAR_LEG, COLORS, 15, 14)}</g>
       <g className="tail">{pixels(CAT, COLORS, 0, 0, isTail)}</g>
-      <g className="leg leg-a">{pixels(LEG, COLORS, 3, 16)}</g>
-      <g className="leg leg-b">{pixels(LEG, COLORS, 8, 16)}</g>
-      <g className="leg leg-a">{pixels(LEG, COLORS, 13, 16)}</g>
-      <g className="leg leg-b">{pixels(LEG, COLORS, 17, 16)}</g>
       <g className="cat-body">
         {pixels(CAT, COLORS, 0, 0, (x, y) => !isHead(x, y) && !isTail(x, y))}
         <g className="head">
@@ -65,6 +65,8 @@ function PixelCat({ facing, eyes }) {
           {EYES[eyes].map(([x, y, c]) => <rect key={`e${x}-${y}`} x={x} y={y} width="1.02" height="1.02" fill={COLORS[c]} />)}
         </g>
       </g>
+      <g className="leg leg-a">{pixels(NEAR_LEG, COLORS, 3, 15)}</g>
+      <g className="leg leg-b">{pixels(NEAR_LEG, COLORS, 13, 15)}</g>
     </svg>
   )
 }
@@ -142,7 +144,7 @@ export default function Pet({ treats, feedSignal }) {
     const fx = Math.max(10, Math.min(w - 34, Math.random() * (w - 44)))
     setFood(fx)
     // Stand so the mouth lands on the treat.
-    const standAt = fx > xRef.current ? fx - 38 : fx - 4
+    const standAt = fx > xRef.current ? fx - 37 : fx - 6
     later(() => {
       walkTo(standAt, () => {
         setFacing(fx > xRef.current + CAT_W / 2 ? 1 : -1)
