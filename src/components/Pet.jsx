@@ -3,7 +3,72 @@ import { useEffect, useRef, useState } from 'react'
 // Mochi the cat: wanders along the bottom of the screen and eats a treat
 // every time you finish a task. Mood comes from tasks finished in the last 24h.
 
-const CAT_W = 64
+const CAT_W = 92
+// ---------- pixel art ----------
+// Each letter is one pixel. K outline, D/M/L grays, W white, P pink, B blush, N nose.
+const COLORS = {
+  K: '#2b2a2e', D: '#5e5d63', M: '#8d8c92', L: '#b9b8bd', W: '#f3f0e8',
+  P: '#f08377', B: '#e9a3a0', N: '#d9616b',
+}
+// 26 x 16 body, facing right. Legs are drawn separately so they can step.
+const CAT = [
+  '...............KK.....KK..',
+  '..............KMDK...KDMK.',
+  '..............KPMMKKKMMPK.',
+  '.............KPPMDMMDMMPPK',
+  '.............KMMDMMMMDMMMK',
+  '............KMMMMMMMMMMMMK',
+  '.KK.........KMMMMMMMMMMMMK',
+  'KMDK........KMMMMMMMMMMMMK',
+  'KDMK........KBMMMWWNWWMMBK',
+  'KMDK........KMMMWWWWWWMMK.',
+  '.KMDK........KKMMWWWWMMKK.',
+  '..KMDKKKKKKKKMMDKKWWWWK...',
+  '..KMMDMMDMMDMMDMKWWWWK....',
+  '..KMDMMDMMDMMDMMMWWWWK....',
+  '..KMMMMMMMMMMMMMMWWWK.....',
+  '...KLLLWWWWWWWLLLLLK......',
+]
+const LEG = ['KMMK', 'KMMK', 'KWWK', 'KKKK']
+const EYES = {
+  open: [[15, 6, 'K'], [16, 6, 'W'], [15, 7, 'K'], [16, 7, 'K'], [21, 6, 'K'], [22, 6, 'W'], [21, 7, 'K'], [22, 7, 'K']],
+  closed: [[15, 7, 'K'], [16, 7, 'K'], [21, 7, 'K'], [22, 7, 'K']],
+  happy: [[14, 7, 'K'], [15, 6, 'K'], [16, 6, 'K'], [17, 7, 'K'], [20, 7, 'K'], [21, 6, 'K'], [22, 6, 'K'], [23, 7, 'K']],
+}
+const FISH = ['.KKKK..K', 'KLLLLKKL', 'KWLLLLLK', 'KLLLLKKL', '.KKKK..K']
+const FISH_COLORS = { K: '#2f4a63', L: '#7fb0d6', W: '#1d2b36' }
+
+function pixels(rows, colors, dx = 0, dy = 0, filter) {
+  const out = []
+  rows.forEach((row, y) => [...row].forEach((ch, x) => {
+    if (ch === '.' || (filter && !filter(x, y))) return
+    out.push(<rect key={`${x + dx}-${y + dy}`} x={x + dx} y={y + dy} width="1.02" height="1.02" fill={colors[ch]} />)
+  }))
+  return out
+}
+
+const isHead = (x, y) => x >= 12 && y <= 10
+const isTail = (x, y) => x <= 4 && y <= 10
+
+function PixelCat({ facing, eyes }) {
+  return (
+    <svg viewBox="0 0 26 20" shapeRendering="crispEdges" style={{ transform: `scaleX(${facing})` }} aria-hidden="true">
+      <g className="tail">{pixels(CAT, COLORS, 0, 0, isTail)}</g>
+      <g className="leg leg-a">{pixels(LEG, COLORS, 3, 16)}</g>
+      <g className="leg leg-b">{pixels(LEG, COLORS, 8, 16)}</g>
+      <g className="leg leg-a">{pixels(LEG, COLORS, 13, 16)}</g>
+      <g className="leg leg-b">{pixels(LEG, COLORS, 17, 16)}</g>
+      <g className="cat-body">
+        {pixels(CAT, COLORS, 0, 0, (x, y) => !isHead(x, y) && !isTail(x, y))}
+        <g className="head">
+          {pixels(CAT, COLORS, 0, 0, isHead)}
+          {EYES[eyes].map(([x, y, c]) => <rect key={`e${x}-${y}`} x={x} y={y} width="1.02" height="1.02" fill={COLORS[c]} />)}
+        </g>
+      </g>
+    </svg>
+  )
+}
+
 const reduceMotion = () =>
   typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
@@ -74,10 +139,10 @@ export default function Pet({ treats, feedSignal }) {
     busyRef.current = true
     setBubble(false)
     const w = areaWidth()
-    const fx = Math.max(10, Math.min(w - 30, Math.random() * (w - 40)))
+    const fx = Math.max(10, Math.min(w - 40, Math.random() * (w - 50)))
     setFood(fx)
     // Stand so the mouth lands on the treat.
-    const standAt = fx > xRef.current ? fx - CAT_W + 14 : fx - 6
+    const standAt = fx > xRef.current ? fx - 51 : fx - 9
     later(() => {
       walkTo(standAt, () => {
         setFacing(fx > xRef.current + CAT_W / 2 ? 1 : -1)
@@ -109,10 +174,8 @@ export default function Pet({ treats, feedSignal }) {
   return (
     <div className="pet-area" ref={areaRef} aria-live="polite">
       {food !== null && (
-        <svg className="pet-food" style={{ left: food }} viewBox="0 0 24 14" aria-hidden="true">
-          <path d="M2 7 Q8 0 16 7 Q8 14 2 7 Z" fill="#7fa7c9" stroke="#3d5a73" strokeWidth="1" />
-          <path d="M16 7 L22 2 L22 12 Z" fill="#7fa7c9" stroke="#3d5a73" strokeWidth="1" />
-          <circle cx="6" cy="6" r="1" fill="#1d2b36" />
+        <svg className="pet-food" style={{ left: food }} viewBox="0 0 8 5" shapeRendering="crispEdges" aria-hidden="true">
+          {pixels(FISH, FISH_COLORS)}
         </svg>
       )}
 
@@ -134,48 +197,7 @@ export default function Pet({ treats, feedSignal }) {
         )}
 
         <button className="pet-btn" onClick={poke} aria-label={`Mochi the cat, ${mood}. ${treats} treats today.`}>
-          <svg viewBox="0 0 64 48" style={{ transform: `scaleX(${facing})` }} aria-hidden="true">
-            {/* tail */}
-            <path className="tail" d="M14 30 C4 28 4 14 10 10" fill="none" stroke="#d98a4a" strokeWidth="5" strokeLinecap="round" />
-            {/* legs (back pair, front pair) */}
-            <g fill="#e89a5c" stroke="#7a4a26" strokeWidth="1.2">
-              <rect className="leg leg-a" x="15" y="36" width="6" height="10" rx="3" />
-              <rect className="leg leg-b" x="22" y="36" width="6" height="10" rx="3" />
-              <rect className="leg leg-b" x="36" y="36" width="6" height="10" rx="3" />
-              <rect className="leg leg-a" x="43" y="36" width="6" height="10" rx="3" />
-            </g>
-            <g className="cat-body">
-              {/* body */}
-              <ellipse cx="31" cy="31" rx="19" ry="11" fill="#f0a868" stroke="#7a4a26" strokeWidth="1.4" />
-              <ellipse cx="33" cy="36" rx="11" ry="5" fill="#fbe3c6" />
-              <path d="M24 21 q2 5 0 9 M31 20 q2 5 0 10 M38 21 q2 5 0 9" stroke="#d98a4a" strokeWidth="2" fill="none" strokeLinecap="round" />
-              {/* head */}
-              <g className="head">
-                <path d="M41 14 L43 3 L49 11 Z" fill="#f0a868" stroke="#7a4a26" strokeWidth="1.2" strokeLinejoin="round" />
-                <path d="M53 11 L58 3 L59 15 Z" fill="#f0a868" stroke="#7a4a26" strokeWidth="1.2" strokeLinejoin="round" />
-                <path d="M44 9 L45 5 L47 9 Z M55 9 L57 6 L57 11 Z" fill="#f4b6b6" />
-                <circle cx="50" cy="20" r="11" fill="#f0a868" stroke="#7a4a26" strokeWidth="1.4" />
-                <path d="M47 10 q1 3 0 5 M51 10 q1 3 0 5" stroke="#d98a4a" strokeWidth="1.6" fill="none" strokeLinecap="round" />
-                {asleep ? (
-                  <g stroke="#3b2414" strokeWidth="1.4" strokeLinecap="round" fill="none">
-                    <path d="M44 19 q2 2 4 0" /><path d="M52 19 q2 2 4 0" />
-                  </g>
-                ) : mood === 'happy' ? (
-                  <g stroke="#3b2414" strokeWidth="1.6" strokeLinecap="round" fill="none">
-                    <path d="M44 20 q2 -3 4 0" /><path d="M52 20 q2 -3 4 0" />
-                  </g>
-                ) : (
-                  <g fill="#3b2414">
-                    <circle cx="46" cy="19" r="1.8" /><circle cx="54" cy="19" r="1.8" />
-                  </g>
-                )}
-                <circle cx="43.5" cy="23.5" r="1.8" fill="#f4a3a3" opacity="0.7" />
-                <circle cx="56.5" cy="23.5" r="1.8" fill="#f4a3a3" opacity="0.7" />
-                <path d="M49 22.5 L51 22.5 L50 24 Z" fill="#c2566b" />
-                <path d="M50 24 q-1.5 2 -3 1 M50 24 q1.5 2 3 1" stroke="#3b2414" strokeWidth="1" fill="none" strokeLinecap="round" />
-              </g>
-            </g>
-          </svg>
+          <PixelCat facing={facing} eyes={asleep ? 'closed' : mood === 'happy' ? 'happy' : 'open'} />
         </button>
       </div>
     </div>

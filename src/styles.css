@@ -63,7 +63,7 @@ input, select {
 input:focus, select:focus { outline: 2px solid var(--highlight); outline-offset: 1px; }
 label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--muted); }
 
-.app { max-width: 720px; margin: 0 auto; padding: 16px 16px calc(96px + env(safe-area-inset-bottom)); }
+.app { max-width: 720px; margin: 0 auto; padding: 16px 16px calc(116px + env(safe-area-inset-bottom)); }
 .stack { display: flex; flex-direction: column; gap: 12px; }
 .row { display: flex; gap: 8px; align-items: center; }
 .row > input { flex: 1; min-width: 0; }
@@ -177,12 +177,12 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 
 /* ---------- Mochi the cat ---------- */
 .pet-area { position: fixed; left: 50%; transform: translateX(-50%); width: min(720px, 100%);
-  bottom: calc(4px + env(safe-area-inset-bottom)); height: 72px; pointer-events: none; z-index: 5; }
-.pet { position: absolute; bottom: 0; width: 64px; height: 48px;
+  bottom: calc(4px + env(safe-area-inset-bottom)); height: 100px; pointer-events: none; z-index: 5; }
+.pet { position: absolute; bottom: 0; width: 92px; height: 71px;
   transition-property: left; transition-timing-function: linear; }
-.pet-btn { width: 64px; height: 48px; padding: 0; border: 0; background: none; cursor: pointer;
+.pet-btn { width: 92px; height: 71px; padding: 0; border: 0; background: none; cursor: pointer;
   pointer-events: auto; display: block; }
-.pet-btn svg { width: 64px; height: 48px; overflow: visible; transition: transform 0.2s; }
+.pet-btn svg { width: 92px; height: 71px; overflow: visible; transition: transform 0.2s; image-rendering: pixelated; }
 .pet .leg { transform-box: fill-box; transform-origin: top center; }
 .pet.walking .leg-a { animation: pet-step 0.35s ease-in-out infinite alternate; }
 .pet.walking .leg-b { animation: pet-step 0.35s ease-in-out infinite alternate-reverse; }
@@ -191,31 +191,36 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .pet.happy .tail { animation-duration: 0.9s; }
 .pet.sleepy:not(.walking) .tail { animation: none; }
 .pet .head { transition: transform 0.25s; }
-.pet.eating .head { transform: translateY(6px) rotate(8deg); transform-box: fill-box; transform-origin: center; }
+.pet.eating .head { transform: translateY(2px); }
 .pet.eating .cat-body { animation: pet-bob 0.25s ease-in-out infinite alternate; }
-@keyframes pet-step { from { transform: rotate(20deg); } to { transform: rotate(-20deg); } }
-@keyframes pet-bob { from { transform: translateY(0); } to { transform: translateY(-1.5px); } }
-@keyframes pet-wag { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-14deg); } }
+@keyframes pet-step { from { transform: translateY(0); } to { transform: translateY(-1px); } }
+@keyframes pet-bob { from { transform: translateY(0); } to { transform: translateY(-0.5px); } }
+@keyframes pet-wag { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-0.6px, -0.6px); } }
 
-.pet-food { position: absolute; bottom: 2px; width: 22px; height: 13px; animation: pet-drop 0.45s ease-out; }
+.pet-food { position: absolute; bottom: 2px; width: 32px; height: 20px; image-rendering: pixelated; animation: pet-drop 0.45s ease-out; }
 @keyframes pet-drop { from { transform: translateY(-60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-.zzz { position: absolute; left: 44px; top: -6px; font-size: 13px; font-weight: 700; color: var(--muted);
+.zzz { position: absolute; left: 74px; top: -10px; font-size: 13px; font-weight: 700; color: var(--muted);
   animation: pet-zzz 2.4s ease-in-out infinite; }
 @keyframes pet-zzz { 0% { transform: translate(0, 0); opacity: 0; } 30% { opacity: 1; } 100% { transform: translate(10px, -18px); opacity: 0; } }
 
-.hearts { position: absolute; left: 22px; top: -4px; display: flex; gap: 4px; color: #e07a8a; font-size: 14px; }
+.hearts { position: absolute; left: 34px; top: -6px; display: flex; gap: 4px; color: #e07a8a; font-size: 14px; }
 .hearts span { animation: pet-heart 1.4s ease-out forwards; opacity: 0; }
 .hearts span:nth-child(2) { animation-delay: 0.15s; }
 .hearts span:nth-child(3) { animation-delay: 0.3s; }
 @keyframes pet-heart { 0% { transform: translateY(0) scale(0.6); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(-34px) scale(1.1); opacity: 0; } }
 
-.pet-bubble { position: absolute; bottom: 56px; left: 50%; transform: translateX(-50%); min-width: 190px;
+.pet-bubble { position: absolute; bottom: 76px; left: 50%; transform: translateX(-50%); min-width: 190px;
   background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 8px 12px;
   font-size: 13px; text-align: center; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12); pointer-events: auto; }
 .pet-bubble .small { margin-top: 2px; }
 .pet-bubble.left { left: 0; transform: none; }
 .pet-bubble.right { left: auto; right: 0; transform: none; }
+
+@media (prefers-color-scheme: dark) {
+  /* faint light edge so the dark outline shows on the dark background */
+  .pet-btn svg, .pet-food { filter: drop-shadow(0 0 1px rgba(239, 235, 223, 0.55)); }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .pet *, .pet, .pet-food { animation: none !important; transition: none !important; }
