@@ -1,22 +1,50 @@
-/* Coastal Dusk theme */
+/* Sage & Cream theme. Light by default; dark follows the device setting. */
 :root {
-  --bg: #05050f;          /* near-black night sky */
-  --card: #1a1020;        /* deep plum */
-  --text: #f7e8e6;
-  --muted: #c8a9b4;
-  --border: #3a2236;
-  --accent: #8e2e46;      /* burgundy: buttons, checked tasks */
+  --bg: #f8f2e4;          /* warm cream */
+  --card: #fffdf7;
+  --text: #23302a;
+  --muted: #5d645c;
+  --border: #e6dcc8;
+  --accent: #3f6b52;      /* sage: buttons, checked tasks */
   --on-accent: #ffffff;
-  --accent-soft: #3b1520; /* dark wine tint: selected tab, reminders */
-  --accent-text: #f5c9cf; /* text on the soft tint */
-  --highlight: #e07a86;   /* readable wine-red for text on dark (logo, links, due soon) */
-  --danger: #f87171;
+  --accent-soft: #e5ede3; /* light sage tint: selected tab, reminders */
+  --accent-text: #2f5540; /* text on the soft tint */
+  --highlight: #3f6b52;   /* logo, links, focus rings */
+  --danger: #b42318;
+  --error-bg: #fde8e6;
+  --error-text: #8a1c12;
+  --tag-personal-bg: #e6eef0; --tag-personal: #2e5560;
+  --tag-school-bg: #efe7f3;   --tag-school: #5b3a6b;
+  --tag-work-bg: #f5e9d6;     --tag-work: #7a4e16;
+  --due-soon: #9a5b13;
   --radius: 14px;
-  color-scheme: dark;     /* dark date pickers, dropdowns and scrollbars */
+  color-scheme: light dark;
   font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
   background: var(--bg);
   -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121613;          /* deep forest night */
+    --card: #1c221e;
+    --text: #efebdf;        /* cream text */
+    --muted: #a9b1a7;
+    --border: #2f3932;
+    --accent: #6a9e7f;      /* brighter sage so it shows on dark */
+    --on-accent: #0f1a13;
+    --accent-soft: #243229;
+    --accent-text: #cfe3d4;
+    --highlight: #9cc5a8;
+    --danger: #f87171;
+    --error-bg: #3a1714;
+    --error-text: #fecaca;
+    --tag-personal-bg: #1f3a40; --tag-personal: #bfe0e8;
+    --tag-school-bg: #352a3d;   --tag-school: #e2cfee;
+    --tag-work-bg: #3f3220;     --tag-work: #f2d9a8;
+    --due-soon: #e6b36a;
+  }
 }
 
 * { box-sizing: border-box; }
@@ -77,7 +105,7 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .icon-btn.danger:hover { color: var(--danger); }
 
 .notice { margin: 0; padding: 10px 12px; border-radius: 10px; font-size: 14px; }
-.notice.error { background: #3f1418; color: #fecaca; }
+.notice.error { background: var(--error-bg); color: var(--error-text); }
 .notice.info { background: var(--accent-soft); color: var(--accent-text); }
 
 .title-input { width: 100%; font-weight: 500; }
@@ -132,11 +160,11 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .check-btn.checked { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .check-btn:disabled { cursor: default; }
 .tag { padding: 2px 8px; border-radius: 999px; font-weight: 600; }
-.tag.personal { background: #6a3350; color: #ffe0ec; }
-.tag.school { background: #2e1a2d; color: #e9c6e0; }
-.tag.work { background: #5a2427; color: #ffd6d1; }
+.tag.personal { background: var(--tag-personal-bg); color: var(--tag-personal); }
+.tag.school { background: var(--tag-school-bg); color: var(--tag-school); }
+.tag.work { background: var(--tag-work-bg); color: var(--tag-work); }
 .due { color: var(--muted); }
-.due.soon { color: #e58a95; font-weight: 600; }
+.due.soon { color: var(--due-soon); font-weight: 600; }
 
 .reminders { background: var(--accent-soft); border: 1px solid var(--accent); border-radius: var(--radius); padding: 12px 14px; }
 .reminders ul { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
