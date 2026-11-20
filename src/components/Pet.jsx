@@ -3,126 +3,151 @@ import { useEffect, useRef, useState } from 'react'
 // Mochi the cat: wanders along the bottom of the screen and eats a treat
 // every time you finish a task. Mood comes from tasks finished in the last 24h.
 
-const CAT_W = 69
+const CAT_W = 81
 // ---------- pixel art ----------
-// Each letter is one pixel. K outline, D/M/L grays, W white, P pink, B blush, N nose, Y eyes.
+// Each letter is one pixel. K outline, D/M/L grays, W white, P pink, Y eyes, N nose.
 const COLORS = {
-  K: '#262529', D: '#4d4c52', M: '#8a8990', L: '#a9a8ae', W: '#f1eee6',
-  P: '#ee8f8a', B: '#e9a3a0', N: '#d9616b', Y: '#f2c94c',
-}
-// Sitting pose (resting, sleeping, eating). 18 x 22, faces the viewer, tail to the right.
-const SIT = [
-  '.K.......K........',
-  'KPK.....KPK.......',
-  'KPMKKKKKMPK.......',
-  'KMDMMDMMDMMK......',
-  'KMMDMMMMDMMK......',
-  'KMMMMMMMMMMK......',
-  'KMMMMMMMMMMK......',
-  'KBMMMNNMMMBK......',
-  '.KMMMWWMMMK.......',
-  '..KKMWWMKK........',
-  '..KMWWWDMK........',
-  '.KMWWWMDMMK.......',
-  '.KMWWWMMDMK....KK.',
-  '.KWWWWMDMMMK..KDK.',
-  'KMWWWWMMDDMK..KMK.',
-  'KMWWWWMDMMMMK.KDK.',
-  'KMWWWWMMDDMMK.KMK.',
-  'KMWWWMMDMMMDMKKDK.',
-  'KMWWWMMMDDMMDMMMK.',
-  'KWWWMMMDMMMMDMMK..',
-  'KWWKWWKMMDDMMMK...',
-  '.KK.KK.KKKKKKK....',
-]
-const SIT_EYES = {
-  open: [[2, 5, 'Y'], [3, 5, 'K'], [2, 6, 'Y'], [3, 6, 'K'], [7, 5, 'Y'], [8, 5, 'K'], [7, 6, 'Y'], [8, 6, 'K']],
-  closed: [[2, 6, 'K'], [3, 6, 'K'], [7, 6, 'K'], [8, 6, 'K']],
-  happy: [[1, 6, 'K'], [2, 5, 'K'], [3, 5, 'K'], [4, 6, 'K'], [6, 6, 'K'], [7, 5, 'K'], [8, 5, 'K'], [9, 6, 'K']],
+  K: '#2a292e', D: '#56555c', M: '#8b8a91', L: '#b3b2b8', W: '#e8e5de',
+  P: '#ee8f8a', Y: '#f2c94c', N: '#3a2f33',
 }
 
-// Walking pose. 23 x 15 body, facing right. Legs are separate so they can step:
-// far-side legs are darker, sit a pixel higher and tuck behind the body.
-const CAT = [
-  '............KK.....KK..',
-  '...........KMDK...KDMK.',
-  '...........KPMMKKKMMPK.',
-  '..........KPPMDMMDMMPPK',
-  '.KK.......KMMDMMMMDMMMK',
-  'KMDK.....KMMMMMMMMMMMMK',
-  'KDMK.....KMMMMMMMMMMMMK',
-  'KMDK.....KMMMMMMMMMMMMK',
-  '.KMDKKKKKKBMMMWWNWWMMBK',
-  '.KDMDMMDMMMMMWWWWWWMMK.',
-  '.KMMDMMDMMDMKKMWWWWMKK.',
-  '.KMDMMDMMDMMMKWWWWWK...',
-  '.KMMMDMMDMMMMMWWWWWK...',
-  '.KMMMMMMMMMMMMWWWWK....',
-  '..KLLLWWWWWWLLLLLK.....',
+// Walking: two frames (legs swap). Faces right. 27 x 18.
+// Sitting (resting, eating) and loaf (sleeping) face left, so they get flipped.
+const WALK_0 = [
+  '.................K.....K...',
+  '................KPK...KPK..',
+  '................KPMKKKMPK..',
+  '................KMDMDMDMK..',
+  '...............KMMMMMMMMMK.',
+  '...............KMMMMMMMMMK.',
+  '..............KKMMMWWWMMMKK',
+  '.....KKKKKKKKKKKKMWWNWWMK..',
+  '..KKKMDMMDMMDMMMMKKWWWKK...',
+  '..KKMMDMMDMMDMMMMMKWWWK....',
+  '.KDKMDMMDMMDMMDMMMMWWK.....',
+  '.KMKMMMMMMMMMMMMMMMWK......',
+  '.KDKKLLLLKKKKKKLLLLLK......',
+  '.KMK.KMKKDK....KDKMK.......',
+  '.KDK.KMKKDK....KDKMK.......',
+  '..KMKKMKKDK....KDKMK.......',
+  '...KKKMKKKK....KKKMK.......',
+  '.....KKK.........KKK.......',
 ]
-const NEAR_LEG = ['KMMK', 'KMMK', 'KWWK', 'KKKK']
-const FAR_LEG = ['KDDK', 'KDDK', 'KLLK', 'KKKK']
-const EYES = {
-  open: [[12, 6, 'Y'], [13, 6, 'K'], [12, 7, 'Y'], [13, 7, 'K'], [18, 6, 'Y'], [19, 6, 'K'], [18, 7, 'Y'], [19, 7, 'K']],
-  happy: [[11, 7, 'K'], [12, 6, 'K'], [13, 6, 'K'], [14, 7, 'K'], [17, 7, 'K'], [18, 6, 'K'], [19, 6, 'K'], [20, 7, 'K']],
+const WALK_1 = [
+  '.................K.....K...',
+  '................KPK...KPK..',
+  '................KPMKKKMPK..',
+  '................KMDMDMDMK..',
+  '...............KMMMMMMMMMK.',
+  '...............KMMMMMMMMMK.',
+  '..............KKMMMWWWMMMKK',
+  '.....KKKKKKKKKKKKMWWNWWMK..',
+  '..KKKMDMMDMMDMMMMKKWWWKK...',
+  '..KKMMDMMDMMDMMMMMKWWWK....',
+  '.KDKMDMMDMMDMMDMMMMWWK.....',
+  '.KMKMMMMMMMMMMMMMMMWK......',
+  '.KDKKLLLLKKKKKKLLLLLK......',
+  '.KMK..KMKK......KMK........',
+  '.KDK..KMKK......KMK........',
+  '..KMK.KMKK......KMK........',
+  '...KK.KMKK......KMK........',
+  '......KKK.......KKK........',
+]
+const SIT = [
+  '...K.....K........',
+  '..KPK...KPK.......',
+  '..KPMKKKMPK.......',
+  '..KMDMDMDMK.......',
+  '.KMMMMMMMMMK......',
+  '.KMMMMMMMMMK......',
+  'KKMMMWWWMMMKK.....',
+  '..KMWWNWWMK.......',
+  '...KKWWWKK....KK..',
+  '..KMMWWWMMK..KMK..',
+  '.KMDMWWWMDMK..KDK.',
+  '.KMMDWWWDMMK..KMK.',
+  '.KDMMWWWMMDK.KDK..',
+  'KMMDMWWWMDMMKKMK..',
+  'KMDMMWWWMMDMMDK...',
+  'KMMDMLWLMDMMMK....',
+  'KMKMMKLKMMKMK.....',
+  '.KKKKK.KKKKKK.....',
+]
+const LOAF = [
+  '..K.....K...........',
+  '.KPK...KPK..........',
+  '.KPMKKKMPKKKKKKKK...',
+  'KMDMDMDMMKDMMDMMDK..',
+  'KMMMMMMMMMKMDMMDMMK.',
+  'KMMMMMMMMMKMMDMMDMMK',
+  'KKMMWWWMMKKDMMDMMMMK',
+  '.KMWWNWWMKMMMDMMDMMK',
+  '..KKWWWKKMMDMMMDMMK.',
+  '.KLLLLLLLLLLLLLLLK..',
+  '..KKKKKKKKKKKKKKK...',
+]
+
+const WALK_EYES = [[17, 5, 'W'], [18, 5, 'K'], [17, 6, 'Y'], [18, 6, 'K'], [22, 5, 'W'], [23, 5, 'K'], [22, 6, 'Y'], [23, 6, 'K']]
+const SIT_EYES = {
+  open: [[3, 4, 'W'], [4, 4, 'K'], [3, 5, 'Y'], [4, 5, 'K'], [7, 4, 'W'], [8, 4, 'K'], [7, 5, 'Y'], [8, 5, 'K']],
+  happy: [[2, 5, 'K'], [3, 4, 'K'], [4, 4, 'K'], [5, 5, 'K'], [6, 5, 'K'], [7, 4, 'K'], [8, 4, 'K'], [9, 5, 'K']],
 }
+const LOAF_EYES = [[2, 5, 'K'], [3, 5, 'K'], [6, 5, 'K'], [7, 5, 'K']]
+
 const FISH = ['.KKKK..K', 'KLLLLKKL', 'KWLLLLLK', 'KLLLLKKL', '.KKKK..K']
 const FISH_COLORS = { K: '#2f4a63', L: '#7fb0d6', W: '#1d2b36' }
 
-function pixels(rows, colors, dx = 0, dy = 0, filter) {
+function pixels(rows, colors, filter) {
   const out = []
   rows.forEach((row, y) => [...row].forEach((ch, x) => {
     if (ch === '.' || (filter && !filter(x, y))) return
-    out.push(<rect key={`${x + dx}-${y + dy}`} x={x + dx} y={y + dy} width="1.02" height="1.02" fill={colors[ch]} />)
+    out.push(<rect key={`${x}-${y}`} x={x} y={y} width="1.02" height="1.02" fill={colors[ch]} />)
   }))
   return out
 }
-
-const isHead = (x, y) => x >= 10 && y <= 9
-const isTail = (x, y) => x <= 4 && y <= 8
-
 const eyeRects = (list) =>
   list.map(([x, y, c]) => <rect key={`e${x}-${y}`} x={x} y={y} width="1.02" height="1.02" fill={COLORS[c]} />)
 
-function WalkCat({ facing, eyes }) {
+function Sprite({ cls, w, h, flip, children }) {
   return (
-    <svg className="walk" viewBox="0 0 23 19" shapeRendering="crispEdges" style={{ transform: `scaleX(${facing})` }} aria-hidden="true">
-      {/* far-side legs first, so the body covers their tops */}
-      <g className="leg leg-b">{pixels(FAR_LEG, COLORS, 5, 14)}</g>
-      <g className="leg leg-a">{pixels(FAR_LEG, COLORS, 15, 14)}</g>
-      <g className="tail">{pixels(CAT, COLORS, 0, 0, isTail)}</g>
-      <g className="cat-body">
-        {pixels(CAT, COLORS, 0, 0, (x, y) => !isHead(x, y) && !isTail(x, y))}
-        <g className="head">
-          {pixels(CAT, COLORS, 0, 0, isHead)}
-          {eyeRects(EYES[eyes === 'happy' ? 'happy' : 'open'])}
-        </g>
-      </g>
-      <g className="leg leg-a">{pixels(NEAR_LEG, COLORS, 3, 15)}</g>
-      <g className="leg leg-b">{pixels(NEAR_LEG, COLORS, 13, 15)}</g>
+    <svg className={cls} viewBox={`0 0 ${w} ${h}`} width={w * 3} height={h * 3} shapeRendering="crispEdges"
+      style={{ transform: `scaleX(${flip})` }} aria-hidden="true">
+      {children}
     </svg>
   )
 }
 
-const sitHead = (x, y) => y <= 8
-const sitTail = (x, y) => x >= 13 && y >= 12 && y <= 18
-
-// The sitting sprite looks left by default, so flip it the other way.
-function SitCat({ facing, eyes }) {
+// pose: 'walk' | 'sit' | 'loaf'
+function PixelCat({ facing, pose, eyes }) {
+  if (pose === 'walk') {
+    return (
+      <Sprite cls="walk" w={27} h={18} flip={facing}>
+        <g className="frame-0">{pixels(WALK_0, COLORS)}</g>
+        <g className="frame-1">{pixels(WALK_1, COLORS)}</g>
+        {eyeRects(WALK_EYES)}
+      </Sprite>
+    )
+  }
+  if (pose === 'loaf') {
+    return (
+      <Sprite cls="loaf" w={20} h={11} flip={-facing}>
+        {pixels(LOAF, COLORS)}
+        {eyeRects(LOAF_EYES)}
+      </Sprite>
+    )
+  }
+  const isHead = (x, y) => y <= 7
+  const isTail = (x, y) => x >= 13 && y >= 8
   return (
-    <svg className="sit" viewBox="0 0 18 22" shapeRendering="crispEdges" style={{ transform: `scaleX(${-facing})` }} aria-hidden="true">
-      <g className="tail">{pixels(SIT, COLORS, 0, 0, sitTail)}</g>
-      {pixels(SIT, COLORS, 0, 0, (x, y) => !sitHead(x, y) && !sitTail(x, y))}
+    <Sprite cls="sit" w={18} h={18} flip={-facing}>
+      <g className="tail">{pixels(SIT, COLORS, isTail)}</g>
+      {pixels(SIT, COLORS, (x, y) => !isHead(x, y) && !isTail(x, y))}
       <g className="head">
-        {pixels(SIT, COLORS, 0, 0, sitHead)}
-        {eyeRects(SIT_EYES[eyes])}
+        {pixels(SIT, COLORS, isHead)}
+        {eyeRects(SIT_EYES[eyes === 'happy' ? 'happy' : 'open'])}
       </g>
-    </svg>
+    </Sprite>
   )
-}
-
-function PixelCat({ facing, eyes, walking }) {
-  return walking ? <WalkCat facing={facing} eyes={eyes} /> : <SitCat facing={facing} eyes={eyes} />
 }
 
 const reduceMotion = () =>
@@ -198,7 +223,7 @@ export default function Pet({ treats, feedSignal }) {
     const fx = Math.max(10, Math.min(w - 34, Math.random() * (w - 44)))
     setFood(fx)
     // Stand so the mouth lands on the treat.
-    const standAt = fx > xRef.current ? fx - 34 : fx - 8
+    const standAt = fx > xRef.current ? fx - 48 : fx - 7
     later(() => {
       walkTo(standAt, () => {
         setFacing(fx > xRef.current + CAT_W / 2 ? 1 : -1)
@@ -236,7 +261,7 @@ export default function Pet({ treats, feedSignal }) {
       )}
 
       <div
-        className={`pet ${walking ? 'walking' : ''} ${eating ? 'eating' : ''} ${mood}`}
+        className={`pet face-${facing > 0 ? 'right' : 'left'} ${walking ? 'walking' : ''} ${eating ? 'eating' : ''} ${mood}`}
         style={{ left: x, transitionDuration: `${duration}s` }}
       >
         {bubble && (
@@ -253,12 +278,13 @@ export default function Pet({ treats, feedSignal }) {
         )}
 
         <button className="pet-btn" onClick={poke} aria-label={`Mochi the cat, ${mood}. ${treats} treats today.`}>
-          <PixelCat facing={facing} walking={walking} eyes={asleep ? 'closed' : mood === 'happy' ? 'happy' : 'open'} />
+          <PixelCat facing={facing} pose={walking ? 'walk' : asleep ? 'loaf' : 'sit'} eyes={eating || mood === 'happy' ? 'happy' : 'open'} />
         </button>
       </div>
     </div>
   )
 }
+
 
 // Exported for previews/tests.
 export { PixelCat }
