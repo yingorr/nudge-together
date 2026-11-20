@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 // Mochi the cat: wanders along the bottom of the screen and eats a treat
 // every time you finish a task. Mood comes from tasks finished in the last 24h.
 
-const CAT_W = 92
+const CAT_W = 74
 // ---------- pixel art ----------
 // Each letter is one pixel. K outline, D/M/L grays, W white, P pink, B blush, N nose.
 const COLORS = {
@@ -139,10 +139,10 @@ export default function Pet({ treats, feedSignal }) {
     busyRef.current = true
     setBubble(false)
     const w = areaWidth()
-    const fx = Math.max(10, Math.min(w - 40, Math.random() * (w - 50)))
+    const fx = Math.max(10, Math.min(w - 34, Math.random() * (w - 44)))
     setFood(fx)
     // Stand so the mouth lands on the treat.
-    const standAt = fx > xRef.current ? fx - 51 : fx - 9
+    const standAt = fx > xRef.current ? fx - 38 : fx - 4
     later(() => {
       walkTo(standAt, () => {
         setFacing(fx > xRef.current + CAT_W / 2 ? 1 : -1)
