@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-// Mochi the cat: wanders along the bottom of the screen and eats a treat
+// 宝宝 the cat: wanders along the bottom of the screen and eats a treat
 // every time you finish a task. Mood comes from tasks finished in the last 24h.
 
 const CAT_W = 72
@@ -159,12 +159,61 @@ const MOOD_LINES = {
   happy: 'So full and happy!',
 }
 
+// ---------- the bed ----------
+const BED = [
+  '....KKKKKKKKKKKKKKKK....',
+  '..KKRRRRRRRRRRRRRRRRKK..',
+  '.KRRSSSSSSSSSSSSSSSSRRK.',
+  'KRRCCCCCCCCCCCCCCCCCCRRK',
+  'KRCCCCHHCCCCCCCCCCCCCCRK',
+  'KRRCCCCCCCCCCCCCCCCCCRRK',
+  '.KRRRRRRRRRRRRRRRRRRRRK.',
+  '..KKKKKKKKKKKKKKKKKKKK..',
+]
+const BED_COLORS = { K: '#2a292e', R: '#6f8f78', S: '#4f6b58', C: '#efe3c8', H: '#fbf6ea' }
+const BED_W = 72 // 24 art pixels x 3
+const IN_BED_OFFSET = 6 // cat's x inside the bed
+
+// The back of the bed sits behind the cat; the front rim is drawn again on top
+// so a sleeping cat looks tucked in.
+function Bed({ x }) {
+  return (
+    <>
+      <svg className="pet-bed" style={{ left: x }} viewBox="0 0 24 8" width={BED_W} height={24}
+        shapeRendering="crispEdges" aria-hidden="true">{pixels(BED, BED_COLORS)}</svg>
+      <svg className="pet-bed front" style={{ left: x }} viewBox="0 5 24 3" width={BED_W} height={9}
+        shapeRendering="crispEdges" aria-hidden="true">{pixels(BED, BED_COLORS, (cx, cy) => cy >= 5)}</svg>
+    </>
+  )
+}
+
+// ---------- where the cat may walk ----------
+// Wide screens: only in the empty space left and right of the task column
+// (it walks *behind* the column to switch sides). Narrow screens: its own strip.
+const WIDE = 960
+const COLUMN = 720
+
+function getLayout(areaW) {
+  const vw = typeof window !== 'undefined' ? window.innerWidth : areaW
+  if (vw >= WIDE) {
+    const colLeft = (vw - COLUMN) / 2
+    const colRight = colLeft + COLUMN
+    const zones = [[12, colLeft - CAT_W - 12], [colRight + 12, vw - CAT_W - 12]].filter(([a, b]) => b > a)
+    return { wide: true, bedX: Math.max(12, colLeft - BED_W - 40), zones }
+  }
+  return { wide: false, bedX: 8, zones: [[0, areaW - CAT_W - 4]] }
+}
+
+const randomIn = ([a, b]) => a + Math.random() * (b - a)
+
 export default function Pet({ treats, feedSignal }) {
   const areaRef = useRef(null)
-  const [x, setX] = useState(24)
-  const [facing, setFacing] = useState(1) // 1 = right, -1 = left
+  const [layout, setLayout] = useState(() => getLayout(typeof window !== 'undefined' ? window.innerWidth : 390))
+  const [x, setX] = useState(layout.bedX + IN_BED_OFFSET)
+  const [facing, setFacing] = useState(-1) // 1 = right, -1 = left
   const [walking, setWalking] = useState(false)
   const [duration, setDuration] = useState(0)
+  const [inBed, setInBed] = useState(true)
   const [food, setFood] = useState(null) // x position of a dropped treat
   const [eating, setEating] = useState(false)
   const [hearts, setHearts] = useState(0) // bump to replay the hearts
@@ -173,23 +222,48 @@ export default function Pet({ treats, feedSignal }) {
   const mood = treats >= 3 ? 'happy' : treats >= 1 ? 'content' : 'sleepy'
 
   // Refs so timers always see the latest values.
-  const xRef = useRef(24)
+  const xRef = useRef(x)
   const walkingRef = useRef(false)
   const busyRef = useRef(false)
+  const inBedRef = useRef(true)
   const moodRef = useRef(mood)
+  const layoutRef = useRef(layout)
   const walkTimer = useRef()
   const timers = useRef([])
   moodRef.current = mood
+  layoutRef.current = layout
 
   const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.current.push(id) }
-  const areaWidth = () => areaRef.current?.clientWidth ?? 320
+  const areaWidth = () => areaRef.current?.clientWidth ?? 390
+
+  // Re-measure on resize; if the cat ends up somewhere it shouldn't be, send it to bed.
+  useEffect(() => {
+    const measure = () => {
+      const l = getLayout(areaWidth())
+      setLayout(l)
+      layoutRef.current = l
+      const ok = inBedRef.current || l.zones.some(([a, b]) => xRef.current >= a - 1 && xRef.current <= b + 1)
+      if (!ok || inBedRef.current) {
+        xRef.current = l.bedX + IN_BED_OFFSET
+        setDuration(0)
+        setX(xRef.current)
+        inBedRef.current = true
+        setInBed(true)
+      }
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   function walkTo(target, onArrive) {
-    const t = Math.max(0, Math.min(areaWidth() - CAT_W, target))
+    const t = Math.max(0, target)
     const dist = Math.abs(t - xRef.current)
     const speed = moodRef.current === 'happy' ? 80 : moodRef.current === 'content' ? 55 : 30 // px per second
     const dur = reduceMotion() ? 0 : dist / speed
     if (dist > 1) setFacing(t > xRef.current ? 1 : -1)
+    inBedRef.current = false
+    setInBed(false)
     setDuration(dur)
     setWalking(dur > 0)
     walkingRef.current = dur > 0
@@ -203,24 +277,44 @@ export default function Pet({ treats, feedSignal }) {
     }, dur * 1000)
   }
 
-  // Wander around now and then (less often when sleepy).
+  function goToBed() {
+    walkTo(layoutRef.current.bedX + IN_BED_OFFSET, () => {
+      setFacing(-1)
+      inBedRef.current = true
+      setInBed(true)
+    })
+  }
+
+  // Wander now and then. Sleepy: head to bed and stay there.
   useEffect(() => {
     if (reduceMotion()) return
     const id = setInterval(() => {
       if (busyRef.current || walkingRef.current) return
-      const chance = moodRef.current === 'sleepy' ? 0.2 : moodRef.current === 'content' ? 0.5 : 0.75
-      if (Math.random() < chance) walkTo(Math.random() * (areaWidth() - CAT_W))
+      if (moodRef.current === 'sleepy') {
+        if (!inBedRef.current) goToBed()
+        return
+      }
+      const r = Math.random()
+      const chance = moodRef.current === 'content' ? 0.5 : 0.75
+      if (r < 0.08) goToBed() // the occasional nap spot visit
+      else if (r < chance) {
+        const zones = layoutRef.current.zones
+        walkTo(randomIn(zones[Math.floor(Math.random() * zones.length)]))
+      }
     }, 3500)
     return () => clearInterval(id)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // A task was completed: drop a treat, walk over, eat it.
+  // A task was completed: drop a treat near the cat (in an allowed spot), walk over, eat it.
   useEffect(() => {
     if (!feedSignal) return
     busyRef.current = true
     setBubble(false)
-    const w = areaWidth()
-    const fx = Math.max(10, Math.min(w - 34, Math.random() * (w - 44)))
+    const zones = layoutRef.current.zones
+    // the zone the cat is in (or nearest to it)
+    const zone = zones.reduce((best, z) =>
+      Math.abs((z[0] + z[1]) / 2 - xRef.current) < Math.abs((best[0] + best[1]) / 2 - xRef.current) ? z : best)
+    const fx = Math.max(zone[0] + 4, Math.min(zone[1] + CAT_W - 30, randomIn([zone[0], zone[1] + CAT_W - 26])))
     setFood(fx)
     // Stand so the mouth lands on the treat.
     const standAt = fx > xRef.current ? fx - 39 : fx - 7
@@ -248,12 +342,14 @@ export default function Pet({ treats, feedSignal }) {
     later(() => setBubble(false), 3500)
   }
 
-  const asleep = mood === 'sleepy' && !walking && !eating
+  const asleep = mood === 'sleepy' && inBed && !walking && !eating
   // Keep the speech bubble on screen near the edges.
   const bubbleSide = x < 70 ? 'left' : x > areaWidth() - CAT_W - 70 ? 'right' : ''
 
   return (
-    <div className="pet-area" ref={areaRef} aria-live="polite">
+    <div className={`pet-area ${layout.wide ? 'wide' : 'strip'}`} ref={areaRef} aria-live="polite">
+      <Bed x={layout.bedX} />
+
       {food !== null && (
         <svg className="pet-food" style={{ left: food }} viewBox="0 0 8 5" shapeRendering="crispEdges" aria-hidden="true">
           {pixels(FISH, FISH_COLORS)}
@@ -261,12 +357,12 @@ export default function Pet({ treats, feedSignal }) {
       )}
 
       <div
-        className={`pet face-${facing > 0 ? 'right' : 'left'} ${walking ? 'walking' : ''} ${eating ? 'eating' : ''} ${mood}`}
+        className={`pet face-${facing > 0 ? 'right' : 'left'} ${walking ? 'walking' : ''} ${eating ? 'eating' : ''} ${inBed && !walking ? 'in-bed' : ''} ${mood}`}
         style={{ left: x, transitionDuration: `${duration}s` }}
       >
         {bubble && (
           <div className={`pet-bubble ${bubbleSide}`}>
-            <strong>Mochi</strong> · {treats} treat{treats === 1 ? '' : 's'} today
+            <strong>宝宝</strong> · {treats} treat{treats === 1 ? '' : 's'} today
             <div className="muted small">{MOOD_LINES[mood]}</div>
           </div>
         )}
@@ -277,14 +373,13 @@ export default function Pet({ treats, feedSignal }) {
           </span>
         )}
 
-        <button className="pet-btn" onClick={poke} aria-label={`Mochi the cat, ${mood}. ${treats} treats today.`}>
+        <button className="pet-btn" onClick={poke} aria-label={`宝宝 the cat, ${mood}. ${treats} treats today.`}>
           <PixelCat facing={facing} pose={walking ? 'walk' : asleep ? 'loaf' : 'sit'} eyes={eating || mood === 'happy' ? 'happy' : 'open'} />
         </button>
       </div>
     </div>
   )
 }
-
 
 // Exported for previews/tests.
 export { PixelCat }

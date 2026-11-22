@@ -73,7 +73,7 @@ export default function Home({ session }) {
   }
 
   async function updateTask(id, changes) {
-    if (changes.completed === true) setFeedSignal((n) => n + 1) // feed Mochi
+    if (changes.completed === true) setFeedSignal((n) => n + 1) // feed 宝宝
     // Optimistic update so the check feels instant.
     setTasks((ts) => ts.map((t) => (t.id === id ? { ...t, ...changes } : t)))
     const { error } = await supabase.from('tasks').update(changes).eq('id', id)
@@ -94,7 +94,7 @@ export default function Home({ session }) {
   ).length
 
   return (
-    <div className="app">
+    <div className={`app ${showPet ? 'with-pet' : ''}`}>
       <header className="topbar">
         <h1 className="logo">Nudge Together</h1>
         <div className="topbar-right">

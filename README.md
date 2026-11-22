@@ -16,7 +16,7 @@ each other accountable with friends.
 - Collapsible date sections: Overdue, Today, This week (next 7 days), Next week & after; the Done button switches to a list of finished tasks
 - Friends: send requests by email (private lookup, emails aren't listed), accept/decline, remove
 - "Show friends' tasks" switch + dropdown to view a friend's tasks (read-only) with a progress bar
-- Mochi the cat: wanders the screen, eats a treat for every finished task, and gets sleepier or happier based on tasks done in the last 24 hours (tap for stats, 🐾 to hide)
+- 宝宝 the cat: wanders beside the task list (its own strip at the bottom on phones), naps in its bed, eats a treat for every finished task, and gets sleepier or happier based on tasks done in the last 24 hours (tap for stats, 🐾 to hide)
 - Live sync across devices (check a task on your phone, it updates on your laptop)
 - Mobile-friendly layout, dark mode
 

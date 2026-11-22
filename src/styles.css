@@ -65,7 +65,9 @@ input, select {
 input:focus, select:focus { outline: 2px solid var(--highlight); outline-offset: 1px; }
 label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--muted); }
 
-.app { max-width: 720px; margin: 0 auto; padding: 16px 16px calc(100px + env(safe-area-inset-bottom)); }
+.app { max-width: 720px; margin: 0 auto; padding: 16px 16px calc(32px + env(safe-area-inset-bottom)); }
+/* phones/tablets: leave room above 宝宝's strip so nothing is covered */
+.app.with-pet { padding-bottom: calc(96px + 24px + env(safe-area-inset-bottom)); }
 .stack { display: flex; flex-direction: column; gap: 12px; }
 .row { display: flex; gap: 8px; align-items: center; }
 .row > input { flex: 1; min-width: 0; }
@@ -208,9 +210,24 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 
 .pet-toggle.off { opacity: 0.4; }
 
-/* ---------- Mochi the cat ---------- */
-.pet-area { position: fixed; left: 50%; transform: translateX(-50%); width: min(720px, 100%);
-  bottom: calc(4px + env(safe-area-inset-bottom)); height: 84px; pointer-events: none; z-index: 5; }
+/* ---------- 宝宝 the cat ---------- */
+/* Narrow screens: its own strip along the bottom, with a solid background. */
+.pet-area { position: fixed; left: 0; right: 0; bottom: 0; height: calc(96px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom); pointer-events: none; z-index: 5; }
+.pet-area.strip { background: var(--bg); border-top: 1px solid var(--border); pointer-events: auto; }
+.pet-area.strip > * { bottom: calc(10px + env(safe-area-inset-bottom)); }
+/* Wide screens: transparent, and *behind* the task column so the cat only shows beside it. */
+@media (min-width: 960px) {
+  .app { position: relative; z-index: 1; }
+  .app.with-pet { padding-bottom: calc(32px + env(safe-area-inset-bottom)); }
+  .pet-area { z-index: 0; }
+}
+
+.pet-bed { position: absolute; bottom: 0; image-rendering: pixelated; }
+.pet-bed.front { z-index: 2; }
+.pet { z-index: 1; }
+.pet.in-bed { bottom: 7px; }
+.pet-area.strip > .pet.in-bed { bottom: calc(17px + env(safe-area-inset-bottom)); }
 .pet { position: absolute; bottom: 0; width: 72px; height: 54px;
   transition-property: left; transition-timing-function: linear; }
 .pet-btn { width: 72px; height: 54px; padding: 0; border: 0; background: none; cursor: pointer;
@@ -232,7 +249,7 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 @keyframes pet-chew { 0%, 49% { transform: translateY(1px); } 50%, 100% { transform: translateY(0); } }
 @keyframes pet-wag { 0%, 69% { transform: translateY(0); } 70%, 100% { transform: translateY(-1px); } }
 
-.pet-food { position: absolute; bottom: 2px; width: 26px; height: 16px; image-rendering: pixelated; animation: pet-drop 0.45s ease-out; }
+.pet-food { position: absolute; bottom: 0; width: 26px; height: 16px; image-rendering: pixelated; animation: pet-drop 0.45s ease-out; }
 @keyframes pet-drop { from { transform: translateY(-60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
 .zzz { position: absolute; left: 30px; top: 8px; font-size: 13px; font-weight: 700; color: var(--muted);
