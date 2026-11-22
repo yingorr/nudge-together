@@ -94,7 +94,7 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .tabs button { flex: 1; border: 0; background: none; padding: 10px; border-radius: 9px; cursor: pointer; }
 .tabs button.active { background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
 
-.btn { border: 1px solid var(--border); background: var(--card); padding: 10px 16px;
+.btn { white-space: nowrap; border: 1px solid var(--border); background: var(--card); padding: 10px 16px;
   border-radius: 10px; cursor: pointer; min-height: 44px; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
 .btn.ghost { background: transparent; }
@@ -224,6 +224,22 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .progress div { height: 100%; background: var(--highlight); transition: width 0.3s; }
 
 .pet-toggle.off { opacity: 0.4; }
+
+/* in-app confirm + undo bar */
+.confirm-inline { display: inline-flex; align-items: center; gap: 6px; }
+.confirm-question { font-size: 14px; font-weight: 600; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); z-index: 20;
+  bottom: calc(16px + env(safe-area-inset-bottom)); max-width: min(560px, calc(100% - 32px));
+  display: flex; align-items: center; gap: 14px; padding: 10px 10px 10px 16px; border-radius: 12px;
+  background: var(--text); color: var(--bg); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); font-size: 14px;
+  animation: toast-in 0.2s ease-out; }
+.toast > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.toast-undo { flex-shrink: 0; background: none; border: 0; color: inherit; font-weight: 700; font-size: 14px;
+  padding: 8px 10px; min-height: 36px; border-radius: 8px; cursor: pointer; text-decoration: underline; }
+.toast-undo:hover { background: rgba(127, 127, 127, 0.2); }
+/* phones: sit above 宝宝's strip */
+@media (max-width: 959px) { .app.with-pet ~ .toast { bottom: calc(80px + env(safe-area-inset-bottom)); } }
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
 /* ---------- 宝宝 the cat ---------- */
 /* Narrow screens: its own strip along the bottom, with a solid background. */

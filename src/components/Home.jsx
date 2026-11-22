@@ -6,6 +6,7 @@ import Reminders from './Reminders'
 import Friends from './Friends'
 import FriendsPanel from './FriendsPanel'
 import Pet from './Pet'
+import UndoToast from './UndoToast'
 
 export default function Home({ session }) {
   const userId = session.user.id
@@ -14,6 +15,7 @@ export default function Home({ session }) {
   const [error, setError] = useState(null)
   const [tab, setTab] = useState('tasks') // 'tasks' | 'friends'
   const [friends, setFriends] = useState([]) // accepted friend profiles
+  const [undo, setUndo] = useState(null) // last deleted task, for the Undo bar
   const [feedSignal, setFeedSignal] = useState(0) // bumps each time a task is completed
   const [showPet, setShowPet] = useState(() => {
     try { return localStorage.getItem('nudge.pet') !== 'false' } catch { return true }
@@ -80,10 +82,23 @@ export default function Home({ session }) {
     if (error) { setError(error.message); loadTasks() }
   }
 
+  // Delete right away, with an Undo bar instead of an "are you sure?" pop-up.
   async function deleteTask(id) {
+    const removed = tasks.find((t) => t.id === id)
     setTasks((ts) => ts.filter((t) => t.id !== id))
     const { error } = await supabase.from('tasks').delete().eq('id', id)
-    if (error) { setError(error.message); loadTasks() }
+    if (error) { setError(error.message); loadTasks(); return }
+    if (removed) setUndo({ task: removed, key: Date.now() })
+  }
+
+  // Put the deleted task back exactly as it was (same id, dates, done state).
+  async function undoDelete() {
+    const task = undo?.task
+    setUndo(null)
+    if (!task) return
+    const { error } = await supabase.from('tasks').insert(task)
+    if (error) setError(error.message)
+    loadTasks()
   }
 
 
@@ -134,6 +149,10 @@ export default function Home({ session }) {
       )}
 
     </div>
+
+    {undo && (
+      <UndoToast key={undo.key} message={`Deleted "${undo.task.title}"`} onUndo={undoDelete} onClose={() => setUndo(null)} />
+    )}
 
     {/* Outside .app so that on wide screens the task column sits on top of the cat */}
     {showPet && <Pet treats={treatsToday} feedSignal={feedSignal} />}

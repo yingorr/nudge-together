@@ -50,7 +50,7 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly }) {
                 onClick={() => { setDraft(task); setEditing(false) }}>Cancel</button>
             </div>
             <button type="button" className="btn danger small"
-              onClick={() => { if (confirm(`Delete "${task.title}"?`)) onDelete(task.id) }}>
+              onClick={() => onDelete(task.id)}>
               Delete
             </button>
           </div>

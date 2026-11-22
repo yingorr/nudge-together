@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
+import ConfirmButton from './ConfirmButton'
 
 export default function Friends({ userId, loadFriends, onViewFriend }) {
   const [rows, setRows] = useState([])
@@ -45,8 +46,7 @@ export default function Friends({ userId, loadFriends, onViewFriend }) {
     refresh()
   }
 
-  async function remove(id, label) {
-    if (!confirm(label)) return
+  async function remove(id) {
     await supabase.from('friendships').delete().eq('id', id)
     refresh()
   }
@@ -76,7 +76,7 @@ export default function Friends({ userId, loadFriends, onViewFriend }) {
               <span>{other(f).display_name}</span>
               <div className="row">
                 <button className="btn primary small" onClick={() => accept(f.id)}>Accept</button>
-                <button className="btn ghost small" onClick={() => remove(f.id, 'Decline this request?')}>Decline</button>
+                <ConfirmButton label="Decline" question="Decline?" onConfirm={() => remove(f.id)} />
               </div>
             </div>
           ))}
@@ -91,8 +91,7 @@ export default function Friends({ userId, loadFriends, onViewFriend }) {
             <span>{other(f).display_name}</span>
             <div className="row">
               <button className="btn small" onClick={() => onViewFriend(other(f).id)}>View tasks</button>
-              <button className="btn ghost small"
-                onClick={() => remove(f.id, `Remove ${other(f).display_name} as a friend?`)}>Remove</button>
+              <ConfirmButton label="Remove" question="Remove?" onConfirm={() => remove(f.id)} />
             </div>
           </div>
         ))}
@@ -104,7 +103,7 @@ export default function Friends({ userId, loadFriends, onViewFriend }) {
           {outgoing.map((f) => (
             <div key={f.id} className="row between">
              
-              <button className="btn ghost small" onClick={() => remove(f.id, 'Cancel this request?')}>Cancel</button>
+              <ConfirmButton label="Cancel" question="Cancel request?" onConfirm={() => remove(f.id)} />
             </div>
           ))}
         </section>
