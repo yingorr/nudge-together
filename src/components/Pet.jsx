@@ -256,7 +256,7 @@ function getLayout(areaW) {
     const zones = [[12, colLeft - CAT_W - 12], [colRight + 12, vw - CAT_W - 12]].filter(([a, b]) => b > a)
     // bed in the left gap, cat tree in the right gap
     const bedX = Math.max(12, colLeft - BED_W - 40)
-    const treeX = Math.min(vw - TREE_COLS * 3 - 12, colRight + 40)
+    const treeX = Math.max(colRight + 12, vw - TREE_COLS * 3 - 24) // near the far right edge
     return { wide: true, treeX, treeScale: 3, bedX, zones }
   }
   // bed on the left end of the strip, cat tree on the right end
