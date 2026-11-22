@@ -94,6 +94,7 @@ export default function Home({ session }) {
   ).length
 
   return (
+    <>
     <div className={`app ${showPet ? 'with-pet' : ''}`}>
       <header className="topbar">
         <h1 className="logo">Nudge Together</h1>
@@ -132,7 +133,10 @@ export default function Home({ session }) {
         />
       )}
 
-      {showPet && <Pet treats={treatsToday} feedSignal={feedSignal} />}
     </div>
+
+    {/* Outside .app so that on wide screens the task column sits on top of the cat */}
+    {showPet && <Pet treats={treatsToday} feedSignal={feedSignal} />}
+    </>
   )
 }
