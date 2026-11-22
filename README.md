@@ -11,7 +11,7 @@ each other accountable with friends.
 - Create, edit, delete tasks with a **name**, **category** (Personal / School / Work),
   optional **priority** (color bar on the left: rose / golden / green) and required **due date**
 - Checkbox to mark complete; filter by category; hide/show finished tasks
-- In-app reminder banner with counts ("2 overdue · 1 due today · 3 due Monday")
+- In-app reminder banner with counts per section ("2 overdue · 1 due today · 3 this week · 1 next week & after")
 - Overdue tag on unfinished past-due tasks, with an Overdue filter that combines with the category filters
 - Collapsible date sections: Overdue, Today, This week (next 7 days), Next week & after; the Done button switches to a list of finished tasks
 - Friends: send requests by email (private lookup, emails aren't listed), accept/decline, remove
