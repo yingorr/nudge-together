@@ -27,7 +27,7 @@ each other accountable with friends.
 3. Copy the **Project URL** (the **Connect** button or **Project Settings → Data API**) and the
    **Publishable key** (`sb_publishable_…`, under **Project Settings → API Keys**).
    **Never use the Secret key in this app** — it bypasses all security rules.
-   (Already ran an older `schema.sql` that had usernames? Also run `supabase/migrations/002_display_name_only.sql`.)
+   `schema.sql` is the only database file. It's safe to re-run, so after pulling app updates just run it again.
 4. (Optional, makes testing easier) **Authentication → Providers → Email**: turn off
    "Confirm email" so new accounts can log in immediately.
 5. **Authentication → URL Configuration**: set Site URL to

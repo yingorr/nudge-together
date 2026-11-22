@@ -1,6 +1,10 @@
 -- =====================================================================
--- Nudge Together — database schema
--- Paste this whole file into Supabase -> SQL Editor -> New query -> Run
+-- Nudge Together — the whole database setup in one file.
+--
+-- Paste this into Supabase -> SQL Editor -> New query -> Run.
+-- It is safe to run again at any time: a new project gets everything,
+-- and an existing project just gets whatever it is missing (new columns,
+-- rules, permissions). After pulling new app changes, run it once more.
 -- =====================================================================
 
 -- ---------- PROFILES ----------------------------------------------------
@@ -64,6 +68,30 @@ create unique index if not exists friendships_pair_idx on public.friendships (
   least(requester_id, addressee_id),
   greatest(requester_id, addressee_id)
 );
+
+-- ---------- UPGRADES FOR EXISTING DATABASES -----------------------------
+-- "create table if not exists" skips tables that already exist, so bring
+-- older databases up to date here. Each step does nothing if already done.
+
+-- Usernames were replaced by display names.
+alter table public.profiles drop column if exists username;
+update public.profiles set display_name = 'Friend' where display_name is null or display_name = '';
+alter table public.profiles alter column display_name set not null;
+
+-- Optional "time needed" estimate.
+alter table public.tasks add column if not exists time_needed text;
+do $$
+begin
+  alter table public.tasks add constraint tasks_time_needed_check
+    check (time_needed in ('low', 'medium', 'high'));
+exception when duplicate_object then null;
+end $$;
+
+-- Every task needs a due date: give any older undated task the day it was created.
+update public.tasks
+set due_date = (created_at at time zone 'America/New_York')::date
+where due_date is null;
+alter table public.tasks alter column due_date set not null;
 
 -- Helper: are two users accepted friends?
 create or replace function public.are_friends(a uuid, b uuid)
