@@ -30,3 +30,29 @@ export function formatDue(iso) {
   })
   return `Due ${label}`
 }
+
+// An unfinished task whose due date has passed.
+export function isOverdue(task) {
+  if (task.completed || !task.due_date) return false
+  return daysUntil(task.due_date) < 0
+}
+
+// Which date section a task belongs in.
+// "This week" = the next 7 days (rolling), "Next week & after" = 8+ days out.
+export function dateGroup(task) {
+  if (task.completed) return 'done'
+  if (!task.due_date) return 'nodate'
+  const d = daysUntil(task.due_date)
+  if (d < 0) return 'overdue'
+  if (d === 0) return 'today'
+  if (d <= 7) return 'week'
+  return 'later'
+}
+
+// Short label for a due day in the reminder banner: "today", "Monday", …
+export function dayLabel(iso) {
+  const days = daysUntil(iso)
+  if (days === 0) return 'today'
+  const [y, m, d] = iso.split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString(undefined, { weekday: 'long' })
+}

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { CATEGORIES, categoryLabel, priorityColor } from '../lib/constants'
-import { daysUntil, formatDue } from '../lib/dates'
+import { daysUntil, formatDue, isOverdue } from '../lib/dates'
 import PriorityPicker from './PriorityPicker'
 
 export default function TaskItem({ task, onUpdate, onDelete, readOnly }) {
@@ -59,6 +59,7 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly }) {
 
   const days = daysUntil(task.due_date)
   const dueSoon = !task.completed && days !== null && days >= 0 && days <= 2
+  const overdue = isOverdue(task)
 
   return (
     <li className={`task ${task.completed ? 'done' : ''}`} style={barStyle}
@@ -67,7 +68,10 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly }) {
         <span className="task-title">{task.title}</span>
         <span className="task-meta">
           <span className={`tag ${task.category}`}>{categoryLabel(task.category)}</span>
-          {task.due_date && <span className={dueSoon ? 'due soon' : 'due'}>{formatDue(task.due_date)}</span>}
+          {overdue && <span className="tag overdue">Overdue</span>}
+          {task.due_date && (
+            <span className={overdue || dueSoon ? 'due soon' : 'due'}>{formatDue(task.due_date)}</span>
+          )}
         </span>
       </div>
       <div className="task-actions">

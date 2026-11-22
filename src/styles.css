@@ -17,6 +17,7 @@
   --tag-school-bg: #efe7f3;   --tag-school: #5b3a6b;
   --tag-work-bg: #fde2cc;     --tag-work: #8a4513;  /* light orange */
   --due-soon: #8b1e2d;   /* maroon */
+  --tag-overdue-bg: #f6dada; --tag-overdue: #8b1e2d;
   --radius: 14px;
   color-scheme: light dark;
   font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -44,6 +45,7 @@
     --tag-school-bg: #352a3d;   --tag-school: #e2cfee;
     --tag-work-bg: #4a2c1a;     --tag-work: #f8c9a0;
     --due-soon: #e8939b; /* light maroon, readable on dark */
+    --tag-overdue-bg: #4a1d24; --tag-overdue: #f4bcc3;
   }
 }
 
@@ -163,12 +165,29 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .tag.personal { background: var(--tag-personal-bg); color: var(--tag-personal); }
 .tag.school { background: var(--tag-school-bg); color: var(--tag-school); }
 .tag.work { background: var(--tag-work-bg); color: var(--tag-work); }
+.tag.overdue { background: var(--tag-overdue-bg); color: var(--tag-overdue); }
+.chip.toggle.overdue-chip.active { background: var(--tag-overdue-bg); color: var(--tag-overdue); border-color: var(--tag-overdue); }
+
+/* date sections */
+.sections { display: flex; flex-direction: column; }
+.section-bar { width: 100%; display: flex; justify-content: space-between; align-items: center;
+  background: none; border: 0; border-top: 1px solid var(--border); padding: 12px 2px; min-height: 44px;
+  cursor: pointer; text-align: left; font-size: 14px; font-weight: 600; color: var(--text); }
+.task-section:first-child .section-bar { border-top: 0; padding-top: 4px; }
+.section-bar:hover { color: var(--highlight); }
+.section-count { display: inline-block; min-width: 22px; margin-left: 6px; padding: 1px 7px; border-radius: 999px;
+  background: var(--accent-soft); color: var(--accent-text); font-size: 12px; text-align: center; }
+.task-section.overdue .section-bar { color: var(--due-soon); }
+.task-section.overdue .section-count { background: var(--tag-overdue-bg); color: var(--tag-overdue); }
+.task-section .task-list { margin-bottom: 6px; }
 .due { color: var(--muted); }
 .due.soon { color: var(--due-soon); font-weight: 600; }
 
 .reminders { background: var(--accent-soft); border: 1px solid var(--accent); border-radius: var(--radius); padding: 12px 14px; }
-.reminders ul { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.reminders li { display: flex; justify-content: space-between; gap: 8px; }
+.reminder-counts { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 14px; }
+.reminder-count { font-weight: 600; font-size: 13px; color: var(--accent-text); background: var(--card);
+  border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; }
+.reminder-count.overdue { color: var(--tag-overdue); background: var(--tag-overdue-bg); border-color: transparent; }
 
 .progress { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; }
 .progress div { height: 100%; background: var(--highlight); transition: width 0.3s; }
