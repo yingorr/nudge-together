@@ -72,9 +72,9 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly }) {
           <span className={`tag ${task.category}`}>{categoryLabel(task.category)}</span>
           {overdue && <span className="tag overdue">Overdue</span>}
           {task.time_needed && (
-            <span className="time-tag" title={`${timeLabel(task.time_needed)} time needed`}>
-              <TimeIcon level={task.time_needed} size={12} />
-              {timeLabel(task.time_needed)} time
+            <span className="time-tag" title={`${timeLabel(task.time_needed)} time needed`}
+              role="img" aria-label={`${timeLabel(task.time_needed)} time needed`}>
+              <TimeIcon level={task.time_needed} size={13} />
             </span>
           )}
           {task.due_date && (

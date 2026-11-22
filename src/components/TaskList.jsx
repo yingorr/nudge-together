@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { CATEGORIES } from '../lib/constants'
+import { CATEGORIES, TIME_NEEDED } from '../lib/constants'
 import { dateGroup, isOverdue } from '../lib/dates'
 import TaskItem from './TaskItem'
 
@@ -39,11 +39,13 @@ function Section({ id, label, tasks, storeKey, children }) {
 export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false }) {
   const [filter, setFilter] = useState('all')
   const [overdueOnly, setOverdueOnly] = useState(false)
+  const [timeFilter, setTimeFilter] = useState('any') // 'any' | 'low' | 'medium' | 'high'
   // 'todo' shows unfinished tasks in date sections; 'done' shows only finished ones.
   const [view, setView] = useState('todo')
   const showingDone = view === 'done'
 
-  const inCategory = (t) => filter === 'all' || t.category === filter
+  const inCategory = (t) =>
+    (filter === 'all' || t.category === filter) && (timeFilter === 'any' || t.time_needed === timeFilter)
   const visible = tasks.filter((t) =>
     showingDone ? t.completed && inCategory(t) : !t.completed && inCategory(t) && (!overdueOnly || isOverdue(t))
   )
@@ -72,6 +74,13 @@ export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false }
             {overdueOnly ? '✓ ' : ''}Overdue ({overdueCount})
           </button>
         )}
+        <label className={`chip select-chip ${timeFilter !== 'any' ? 'active-soft' : ''}`}>
+          <span className="sr-only">Time needed</span>
+          <select value={timeFilter} onChange={(e) => setTimeFilter(e.target.value)} aria-label="Filter by time needed">
+            <option value="any">Time: any</option>
+            {TIME_NEEDED.map((t) => <option key={t.value} value={t.value}>Time: {t.label.toLowerCase()}</option>)}
+          </select>
+        </label>
         <button className={`chip toggle ${showingDone ? 'active' : ''}`} aria-pressed={showingDone}
           onClick={() => setView(showingDone ? 'todo' : 'done')}>
           {showingDone ? '✓ ' : ''}Done ({doneCount})
