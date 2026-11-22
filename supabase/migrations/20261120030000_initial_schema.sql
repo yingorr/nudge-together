@@ -1,31 +1,28 @@
 -- =====================================================================
--- Nudge Together — the whole database setup in one file.
---
--- Paste this into Supabase -> SQL Editor -> New query -> Run.
--- It is safe to run again at any time: a new project gets everything,
--- and an existing project just gets whatever it is missing (new columns,
--- rules, permissions). After pulling new app changes, run it once more.
+-- Migration: initial schema (profiles, tasks, friendships, security rules)
 -- =====================================================================
 
 -- ---------- PROFILES ----------------------------------------------------
 -- One row per user. Created automatically when someone signs up.
 create table if not exists public.profiles (
   id           uuid primary key references auth.users (id) on delete cascade,
-  display_name text not null,
+  username     text unique not null check (username ~ '^[a-z0-9_]{3,20}$'),
+  display_name text,
   created_at   timestamptz not null default now()
 );
 
--- Copy the display name from the sign-up form into profiles.
+-- Copy username / display name from the sign-up form into profiles.
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.profiles (id, display_name)
+  insert into public.profiles (id, username, display_name)
   values (
     new.id,
-    coalesce(nullif(trim(new.raw_user_meta_data ->> 'display_name'), ''), split_part(new.email, '@', 1))
+    lower(new.raw_user_meta_data ->> 'username'),
+    coalesce(new.raw_user_meta_data ->> 'display_name', new.raw_user_meta_data ->> 'username')
   );
   return new;
 end;
@@ -43,8 +40,7 @@ create table if not exists public.tasks (
   title        text not null check (char_length(title) between 1 and 200),
   category     text not null check (category in ('personal', 'school', 'work')),
   priority     text check (priority in ('low', 'medium', 'high')),  -- optional
-  time_needed  text check (time_needed in ('low', 'medium', 'high')), -- optional
-  due_date     date not null,                                        -- required
+  due_date     date,                                                 -- optional
   completed    boolean not null default false,
   completed_at timestamptz,
   created_at   timestamptz not null default now()
@@ -69,30 +65,6 @@ create unique index if not exists friendships_pair_idx on public.friendships (
   greatest(requester_id, addressee_id)
 );
 
--- ---------- UPGRADES FOR EXISTING DATABASES -----------------------------
--- "create table if not exists" skips tables that already exist, so bring
--- older databases up to date here. Each step does nothing if already done.
-
--- Usernames were replaced by display names.
-alter table public.profiles drop column if exists username;
-update public.profiles set display_name = 'Friend' where display_name is null or display_name = '';
-alter table public.profiles alter column display_name set not null;
-
--- Optional "time needed" estimate.
-alter table public.tasks add column if not exists time_needed text;
-do $$
-begin
-  alter table public.tasks add constraint tasks_time_needed_check
-    check (time_needed in ('low', 'medium', 'high'));
-exception when duplicate_object then null;
-end $$;
-
--- Every task needs a due date: give any older undated task the day it was created.
-update public.tasks
-set due_date = (created_at at time zone 'America/New_York')::date
-where due_date is null;
-alter table public.tasks alter column due_date set not null;
-
 -- Helper: are two users accepted friends?
 create or replace function public.are_friends(a uuid, b uuid)
 returns boolean
@@ -108,25 +80,6 @@ as $$
   );
 $$;
 
--- Find someone by their exact email to send a friend request.
--- Runs with elevated rights so it can read auth.users, but only returns
--- id + display name for one exact match (nobody can browse emails).
-create or replace function public.find_profile_by_email(p_email text)
-returns table (id uuid, display_name text)
-language sql
-stable
-security definer set search_path = public
-as $$
-  select p.id, p.display_name
-  from public.profiles p
-  join auth.users u on u.id = p.id
-  where lower(u.email) = lower(trim(p_email))
-  limit 1;
-$$;
-
-revoke execute on function public.find_profile_by_email(text) from public, anon;
-grant execute on function public.find_profile_by_email(text) to authenticated;
-
 -- ---------- ROW LEVEL SECURITY -----------------------------------------
 -- RLS = the database itself checks who is allowed to see/change each row,
 -- so even though the anon key is public, nobody can read other people's data.
@@ -134,7 +87,7 @@ alter table public.profiles    enable row level security;
 alter table public.tasks       enable row level security;
 alter table public.friendships enable row level security;
 
--- Profiles: any logged-in user can read display names (to show friends);
+-- Profiles: any logged-in user can look up usernames (to add friends);
 -- you can only edit your own profile.
 drop policy if exists "profiles readable by logged-in users" on public.profiles;
 create policy "profiles readable by logged-in users"
@@ -188,18 +141,6 @@ drop policy if exists "remove friendship" on public.friendships;
 create policy "remove friendship"
   on public.friendships for delete to authenticated
   using (auth.uid() in (requester_id, addressee_id));
-
--- ---------- TABLE ACCESS --------------------------------------------
--- Newer Supabase projects don't auto-grant table access; RLS above still
--- limits which rows each user can see or change.
-grant usage on schema public to authenticated;
-
-grant select, update                 on public.profiles    to authenticated;
-grant select, insert, update, delete on public.tasks       to authenticated;
-grant select, insert, update, delete on public.friendships to authenticated;
-
-grant execute on function public.are_friends(uuid, uuid)        to authenticated;
-grant execute on function public.find_profile_by_email(text)    to authenticated;
 
 -- ---------- LIVE SYNC ---------------------------------------------------
 -- Lets the app hear about task changes instantly (e.g. checked off on phone,

@@ -23,11 +23,10 @@ each other accountable with friends.
 ## 1. Set up Supabase (one time, ~10 min)
 
 1. Create a free project at <https://supabase.com>.
-2. Open **SQL Editor → New query**, paste all of [`supabase/schema.sql`](supabase/schema.sql), click **Run**.
+2. Apply the database migrations (see [Database changes](#database-changes) below): `npx supabase link --project-ref <your-project-ref>` then `npx supabase db push`.
 3. Copy the **Project URL** (the **Connect** button or **Project Settings → Data API**) and the
    **Publishable key** (`sb_publishable_…`, under **Project Settings → API Keys**).
    **Never use the Secret key in this app** — it bypasses all security rules.
-   `schema.sql` is the only database file. It's safe to re-run, so after pulling app updates just run it again.
 4. (Optional, makes testing easier) **Authentication → Providers → Email**: turn off
    "Confirm email" so new accounts can log in immediately.
 5. **Authentication → URL Configuration**: set Site URL to
@@ -62,7 +61,7 @@ On iPhone/iPad: open the site in Safari → Share → **Add to Home Screen** for
 
 | Piece | File | What it does |
 |---|---|---|
-| Database + security | `supabase/schema.sql` | Tables for profiles, tasks, friendships. Row Level Security means you can only change your own tasks, and only accepted friends can read them. |
+| Database + security | `supabase/migrations/` | Tables for profiles, tasks, friendships. Row Level Security means you can only change your own tasks, and only accepted friends can read them. |
 | Login | `src/components/Auth.jsx` | Email/password sign up & log in via Supabase Auth |
 | Home screen | `src/components/Home.jsx` | Loads your tasks, live sync, friend toggle/dropdown |
 | Tasks | `TaskForm.jsx`, `TaskList.jsx`, `TaskItem.jsx`, `PriorityPicker.jsx` | Add / filter / check off / edit / delete |
@@ -71,7 +70,25 @@ On iPhone/iPad: open the site in Safari → Share → **Add to Home Screen** for
 
 **Why is the publishable (anon) key OK to put in the browser?** It only identifies the project. What
 each user may read or write is enforced inside the database by the RLS policies in
-`schema.sql`, using the logged-in user's ID.
+the migrations, using the logged-in user's ID.
+
+## Database changes
+
+The database is defined by numbered migration files in [`supabase/migrations/`](supabase/migrations/),
+one file per change, applied in order (oldest first). Supabase records which ones a project has
+already run, so each runs exactly once.
+
+| File | What it does |
+|---|---|
+| `20261120030000_initial_schema.sql` | Profiles, tasks, friendships, security rules, live sync |
+| `20261120040000_display_name_only.sql` | Usernames → display names; add friends by email |
+| `20261120043000_grant_table_access.sql` | Lets logged-in users reach the tables (rules still apply) |
+| `20261122201500_require_due_date.sql` | Every task must have a due date |
+| `20261122203500_time_needed.sql` | Optional "time needed" (low / medium / high) |
+
+**To change the database:** add a new file named `YYYYMMDDHHMMSS_short_description.sql`
+(`npx supabase migration new short_description` creates one), write the SQL, then run
+`npx supabase db push`. Never edit a migration that has already been applied; add a new one instead.
 
 ## Out of scope for v1
 
