@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { CATEGORIES, categoryLabel, priorityColor } from '../lib/constants'
+import { categoryLabel, priorityColor } from '../lib/constants'
 import { daysUntil, formatDue, isOverdue } from '../lib/dates'
-import PriorityPicker from './PriorityPicker'
+import TaskFields from './TaskFields'
 
 export default function TaskItem({ task, onUpdate, onDelete, readOnly }) {
   const [editing, setEditing] = useState(false)
@@ -17,12 +17,12 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly }) {
 
   function save(e) {
     e.preventDefault()
-    if (!draft.title.trim()) return
+    if (!draft.title.trim() || !draft.due_date) return
     onUpdate(task.id, {
       title: draft.title.trim(),
       category: draft.category,
       priority: draft.priority,
-      due_date: draft.due_date || null,
+      due_date: draft.due_date,
     })
     setEditing(false)
   }
@@ -33,17 +33,16 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly }) {
         <form className="stack" onSubmit={save}>
           <input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })}
             maxLength={200} autoFocus />
-          <div className="row wrap">
-            <select value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })}>
-              {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-            </select>
-            <input type="date" value={draft.due_date ?? ''}
-              onChange={(e) => setDraft({ ...draft, due_date: e.target.value })} />
-            <PriorityPicker value={draft.priority} onChange={(p) => setDraft({ ...draft, priority: p })} />
-          </div>
+          <TaskFields
+            idPrefix={`edit-${task.id}`}
+            category={draft.category}
+            dueDate={draft.due_date}
+            priority={draft.priority}
+            onChange={(c) => setDraft({ ...draft, ...c })}
+          />
           <div className="row between">
             <div className="row">
-              <button className="btn primary small">Save</button>
+              <button className="btn primary small" disabled={!draft.title.trim() || !draft.due_date}>Save</button>
               <button type="button" className="btn ghost small"
                 onClick={() => { setDraft(task); setEditing(false) }}>Cancel</button>
             </div>

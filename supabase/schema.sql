@@ -39,7 +39,7 @@ create table if not exists public.tasks (
   title        text not null check (char_length(title) between 1 and 200),
   category     text not null check (category in ('personal', 'school', 'work')),
   priority     text check (priority in ('low', 'medium', 'high')),  -- optional
-  due_date     date,                                                 -- optional
+  due_date     date not null,                                        -- required
   completed    boolean not null default false,
   completed_at timestamptz,
   created_at   timestamptz not null default now()

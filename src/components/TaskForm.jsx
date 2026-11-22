@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { CATEGORIES } from '../lib/constants'
-import PriorityPicker from './PriorityPicker'
+import TaskFields from './TaskFields'
 
 // Hidden behind an "Add task" button; opens as a card when tapped.
 export default function TaskForm({ onAdd }) {
@@ -18,8 +17,8 @@ export default function TaskForm({ onAdd }) {
 
   function handleSubmit(e) {
     e.preventDefault()
-    if (!title.trim()) return
-    onAdd({ title: title.trim(), category, priority, due_date: dueDate || null })
+    if (!title.trim() || !dueDate) return
+    onAdd({ title: title.trim(), category, priority, due_date: dueDate })
     reset()
     setOpen(false)
   }
@@ -42,15 +41,19 @@ export default function TaskForm({ onAdd }) {
         maxLength={200}
         autoFocus
       />
-      <div className="row wrap">
-        <select value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Category">
-          {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-        </select>
-        <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} aria-label="Due date" />
-        <PriorityPicker value={priority} onChange={setPriority} />
-      </div>
+      <TaskFields
+        idPrefix="new"
+        category={category}
+        dueDate={dueDate}
+        priority={priority}
+        onChange={(c) => {
+          if ('category' in c) setCategory(c.category)
+          if ('due_date' in c) setDueDate(c.due_date)
+          if ('priority' in c) setPriority(c.priority)
+        }}
+      />
       <div className="row">
-        <button className="btn primary" disabled={!title.trim()}>Add</button>
+        <button className="btn primary" disabled={!title.trim() || !dueDate}>Add</button>
         <button type="button" className="btn ghost" onClick={() => { reset(); setOpen(false) }}>Cancel</button>
       </div>
     </form>

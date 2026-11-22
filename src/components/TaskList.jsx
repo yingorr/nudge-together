@@ -8,7 +8,6 @@ const SECTIONS = [
   { id: 'today', label: 'Today' },
   { id: 'week', label: 'This week' },
   { id: 'later', label: 'Next week & after' },
-  { id: 'nodate', label: 'No due date' },
   { id: 'done', label: 'Done' },
 ]
 

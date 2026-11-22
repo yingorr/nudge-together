@@ -112,6 +112,19 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 
 .title-input { width: 100%; font-weight: 500; }
 
+/* labeled task fields (add + edit forms) */
+.task-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field-label { font-size: 13px; font-weight: 600; color: var(--muted); }
+.field-label .required { color: var(--due-soon); }
+.field select, .field input { width: 100%; height: 44px; min-height: 44px; }
+.field.full { grid-column: 1 / -1; }
+/* iPhone date boxes collapse when empty: keep them full height and show a hint */
+.field input[type="date"] { -webkit-appearance: none; appearance: none; text-align: left; padding: 0 12px; }
+.field input[type="date"]::-webkit-date-and-time-value { text-align: left; }
+.field input[type="date"].empty { color: var(--muted); }
+.task-fields .priority-picker { flex-wrap: wrap; }
+
 .priority-picker { display: flex; gap: 4px; }
 .prio-btn { border: 1px solid var(--border); background: transparent; border-radius: 999px;
   padding: 6px 10px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }

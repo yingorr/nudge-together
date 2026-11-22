@@ -41,7 +41,7 @@ export function isOverdue(task) {
 // "This week" = the next 7 days (rolling), "Next week & after" = 8+ days out.
 export function dateGroup(task) {
   if (task.completed) return 'done'
-  if (!task.due_date) return 'nodate'
+  if (!task.due_date) return 'later' // shouldn't happen: due dates are required
   const d = daysUntil(task.due_date)
   if (d < 0) return 'overdue'
   if (d === 0) return 'today'
