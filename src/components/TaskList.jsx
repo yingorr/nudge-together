@@ -8,7 +8,6 @@ const SECTIONS = [
   { id: 'today', label: 'Today' },
   { id: 'week', label: 'This week' },
   { id: 'later', label: 'Next week & after' },
-  { id: 'done', label: 'Done' },
 ]
 
 // Soonest first; undated tasks keep newest-first order.
@@ -40,19 +39,23 @@ function Section({ id, label, tasks, storeKey, children }) {
 export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false }) {
   const [filter, setFilter] = useState('all')
   const [overdueOnly, setOverdueOnly] = useState(false)
-  const [showDone, setShowDone] = useState(true)
+  // 'todo' shows unfinished tasks in date sections; 'done' shows only finished ones.
+  const [view, setView] = useState('todo')
+  const showingDone = view === 'done'
 
-  const visible = tasks.filter(
-    (t) =>
-      (filter === 'all' || t.category === filter) &&
-      (!overdueOnly || isOverdue(t)) &&
-      (showDone || !t.completed)
+  const inCategory = (t) => filter === 'all' || t.category === filter
+  const visible = tasks.filter((t) =>
+    showingDone ? t.completed && inCategory(t) : !t.completed && inCategory(t) && (!overdueOnly || isOverdue(t))
   )
   const doneCount = tasks.filter((t) => t.completed).length
   const overdueCount = tasks.filter(isOverdue).length
 
   const groups = Object.fromEntries(SECTIONS.map((s) => [s.id, []]))
-  visible.forEach((t) => groups[dateGroup(t)].push(t))
+  if (!showingDone) visible.forEach((t) => groups[dateGroup(t)].push(t))
+  // Finished tasks: most recently completed first.
+  const doneList = showingDone
+    ? [...visible].sort((a, b) => (b.completed_at ?? '').localeCompare(a.completed_at ?? ''))
+    : []
 
   return (
     <section className={readOnly ? 'stack' : 'card stack'}>
@@ -63,18 +66,35 @@ export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false }
             {c.label}
           </button>
         ))}
-        <button className={`chip toggle overdue-chip ${overdueOnly ? 'active' : ''}`} aria-pressed={overdueOnly}
-          onClick={() => setOverdueOnly(!overdueOnly)}>
-          {overdueOnly ? '✓ ' : ''}Overdue ({overdueCount})
-        </button>
-        <button className={`chip toggle ${showDone ? 'active' : ''}`} aria-pressed={showDone}
-          onClick={() => setShowDone(!showDone)}>
-          {showDone ? '✓ ' : ''}Done ({doneCount}/{tasks.length})
+        {!showingDone && (
+          <button className={`chip toggle overdue-chip ${overdueOnly ? 'active' : ''}`} aria-pressed={overdueOnly}
+            onClick={() => setOverdueOnly(!overdueOnly)}>
+            {overdueOnly ? '✓ ' : ''}Overdue ({overdueCount})
+          </button>
+        )}
+        <button className={`chip toggle ${showingDone ? 'active' : ''}`} aria-pressed={showingDone}
+          onClick={() => setView(showingDone ? 'todo' : 'done')}>
+          {showingDone ? '✓ ' : ''}Done ({doneCount})
         </button>
       </div>
 
+      {showingDone && (
+        <div className="row between done-header">
+          <strong>Finished tasks</strong>
+          <button className="link small" onClick={() => setView('todo')}>← Back to to-do</button>
+        </div>
+      )}
+
       {visible.length === 0 ? (
-        <p className="muted empty">{tasks.length === 0 ? 'No tasks yet.' : 'Nothing here.'}</p>
+        <p className="muted empty">
+          {tasks.length === 0 ? 'No tasks yet.' : showingDone ? 'Nothing finished here yet.' : 'All caught up!'}
+        </p>
+      ) : showingDone ? (
+        <ul className="task-list">
+          {doneList.map((t) => (
+            <TaskItem key={t.id} task={t} onUpdate={onUpdate} onDelete={onDelete} readOnly={readOnly} />
+          ))}
+        </ul>
       ) : (
         <div className="sections">
           {SECTIONS.filter((s) => groups[s.id].length > 0).map((s) => (

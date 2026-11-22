@@ -13,7 +13,7 @@ each other accountable with friends.
 - Checkbox to mark complete; filter by category; hide/show finished tasks
 - In-app reminder banner with counts ("2 overdue · 1 due today · 3 due Monday")
 - Overdue tag on unfinished past-due tasks, with an Overdue filter that combines with the category filters
-- Collapsible date sections: Overdue, Today, This week (next 7 days), Next week & after, Done
+- Collapsible date sections: Overdue, Today, This week (next 7 days), Next week & after; the Done button switches to a list of finished tasks
 - Friends: send requests by email (private lookup, emails aren't listed), accept/decline, remove
 - "Show friends' tasks" switch + dropdown to view a friend's tasks (read-only) with a progress bar
 - Mochi the cat: wanders the screen, eats a treat for every finished task, and gets sleepier or happier based on tasks done in the last 24 hours (tap for stats, 🐾 to hide)

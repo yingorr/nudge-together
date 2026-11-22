@@ -193,6 +193,7 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .task-section.overdue .section-bar { color: var(--due-soon); }
 .task-section.overdue .section-count { background: var(--tag-overdue-bg); color: var(--tag-overdue); }
 .task-section .task-list { margin-bottom: 6px; }
+.done-header { padding: 2px 2px 0; }
 .due { color: var(--muted); }
 .due.soon { color: var(--due-soon); font-weight: 600; }
 
