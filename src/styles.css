@@ -67,7 +67,7 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 
 .app { max-width: 720px; margin: 0 auto; padding: 16px 16px calc(32px + env(safe-area-inset-bottom)); }
 /* phones/tablets: leave room above 宝宝's strip so nothing is covered */
-.app.with-pet { padding-bottom: calc(96px + 24px + env(safe-area-inset-bottom)); }
+.app.with-pet { padding-bottom: calc(68px + 24px + env(safe-area-inset-bottom)); }
 .stack { display: flex; flex-direction: column; gap: 12px; }
 .row { display: flex; gap: 8px; align-items: center; }
 .row > input { flex: 1; min-width: 0; }
@@ -227,10 +227,10 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 
 /* ---------- 宝宝 the cat ---------- */
 /* Narrow screens: its own strip along the bottom, with a solid background. */
-.pet-area { position: fixed; left: 0; right: 0; bottom: 0; height: calc(96px + env(safe-area-inset-bottom));
+.pet-area { position: fixed; left: 0; right: 0; bottom: 0; height: calc(68px + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom); pointer-events: none; z-index: 5; }
 .pet-area.strip { background: var(--bg); border-top: 1px solid var(--border); pointer-events: auto; }
-.pet-area.strip > * { bottom: calc(10px + env(safe-area-inset-bottom)); }
+.pet-area.strip > * { bottom: calc(6px + env(safe-area-inset-bottom)); }
 /* Wide screens: transparent, and *behind* the task column so the cat only shows beside it. */
 @media (min-width: 960px) {
   .app { position: relative; z-index: 1; }
@@ -242,7 +242,7 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .pet-bed.front { z-index: 2; }
 .pet { z-index: 1; }
 .pet.in-bed { bottom: 7px; }
-.pet-area.strip > .pet.in-bed { bottom: calc(17px + env(safe-area-inset-bottom)); }
+.pet-area.strip > .pet.in-bed { bottom: calc(13px + env(safe-area-inset-bottom)); }
 .pet { position: absolute; bottom: 0; width: 72px; height: 54px;
   transition-property: left; transition-timing-function: linear; }
 .pet-btn { width: 72px; height: 54px; padding: 0; border: 0; background: none; cursor: pointer;
