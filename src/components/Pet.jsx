@@ -254,10 +254,13 @@ function getLayout(areaW) {
     const colLeft = (vw - COLUMN) / 2
     const colRight = colLeft + COLUMN
     const zones = [[12, colLeft - CAT_W - 12], [colRight + 12, vw - CAT_W - 12]].filter(([a, b]) => b > a)
-    const bedX = Math.max(TREE_COLS * 3 + 24, colLeft - BED_W - 40)
-    return { wide: true, treeX: bedX - TREE_COLS * 3 - 16, treeScale: 3, bedX, zones }
+    // bed in the left gap, cat tree in the right gap
+    const bedX = Math.max(12, colLeft - BED_W - 40)
+    const treeX = Math.min(vw - TREE_COLS * 3 - 12, colRight + 40)
+    return { wide: true, treeX, treeScale: 3, bedX, zones }
   }
-  return { wide: false, treeX: 6, treeScale: 2, bedX: 6 + TREE_COLS * 2 + 10, zones: [[0, areaW - CAT_W - 4]] }
+  // bed on the left end of the strip, cat tree on the right end
+  return { wide: false, treeX: areaW - TREE_COLS * 2 - 6, treeScale: 2, bedX: 8, zones: [[0, areaW - CAT_W - 4]] }
 }
 
 const randomIn = ([a, b]) => a + Math.random() * (b - a)
