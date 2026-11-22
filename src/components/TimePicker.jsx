@@ -1,4 +1,5 @@
 import { TIME_NEEDED } from '../lib/constants'
+import TimeIcon from './TimeIcon'
 
 // Optional time needed: tap to set, tap again to clear (same feel as priority).
 export default function TimePicker({ value, onChange }) {
@@ -13,7 +14,7 @@ export default function TimePicker({ value, onChange }) {
           className={`time-btn ${value === t.value ? 'selected' : ''}`}
           onClick={() => onChange(value === t.value ? null : t.value)}
         >
-          <span className="time-dots" aria-hidden="true">{'●'.repeat(t.dots)}</span>
+          <TimeIcon level={t.value} />
           {t.label}
         </button>
       ))}

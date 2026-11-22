@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { categoryLabel, priorityColor, timeLabel, TIME_NEEDED } from '../lib/constants'
+import { categoryLabel, priorityColor, timeLabel } from '../lib/constants'
+import TimeIcon from './TimeIcon'
 import { daysUntil, formatDue, isOverdue } from '../lib/dates'
 import TaskFields from './TaskFields'
 
@@ -72,8 +73,8 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly }) {
           {overdue && <span className="tag overdue">Overdue</span>}
           {task.time_needed && (
             <span className="time-tag" title={`${timeLabel(task.time_needed)} time needed`}>
-              <span aria-hidden="true">{'●'.repeat(TIME_NEEDED.find((t) => t.value === task.time_needed)?.dots ?? 0)}</span>
-              {' '}{timeLabel(task.time_needed)} time
+              <TimeIcon level={task.time_needed} size={12} />
+              {timeLabel(task.time_needed)} time
             </span>
           )}
           {task.due_date && (

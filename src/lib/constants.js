@@ -17,11 +17,11 @@ export const priorityColor = (p) =>
 export const categoryLabel = (c) =>
   CATEGORIES.find((x) => x.value === c)?.label ?? c
 
-// Optional "time needed" estimate. Dots show how big the task is.
+// Optional "time needed" estimate. A quarter / half / full circle shows how big the task is.
 export const TIME_NEEDED = [
-  { value: 'low', label: 'Low', dots: 1 },
-  { value: 'medium', label: 'Medium', dots: 2 },
-  { value: 'high', label: 'High', dots: 3 },
+  { value: 'low', label: 'Low' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'high', label: 'High' },
 ]
 
 export const timeLabel = (t) => TIME_NEEDED.find((x) => x.value === t)?.label ?? null
