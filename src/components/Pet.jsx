@@ -187,6 +187,61 @@ function Bed({ x }) {
   )
 }
 
+// ---------- the cat tree ----------
+// Plush perches at two heights, a rope-wrapped post, a cubby and a pom-pom toy.
+// Drawn at 3x on wide screens and 2x on phones (so it fits the bottom strip).
+const TREE = [
+  '...O..O...............',
+  '..OOOOOOOO............',
+  '.OFFFffFFFO...........',
+  '.OFfFFffFFO...........',
+  '.OssssssssO...........',
+  '..OOOOOOOO............',
+  '..T.OPO...............',
+  '..T.OPO...............',
+  '..T.OPO...............',
+  '..T.OPO..O..O..O..O...',
+  '..T.OPO.OOOOOOOOOOOOO.',
+  '..T.OPOOFffFFfFFffFFFO',
+  '..T.OPOOFFFFFFFfFfFFfO',
+  '.OQOOPOOsssssssssssssO',
+  '.QQQOPO.OOOOOOOOOOOOO.',
+  '.OQOOPO.......OPO.....',
+  '....OPO.......OPO.....',
+  '....OPO.......OPO.....',
+  '....OPO.......OPO.....',
+  '....OPO....OOOOPOOOO..',
+  '...OyyyO...OBBBBBBBO..',
+  '...OYYYO...OBBHHHBBO..',
+  '...OyyyO...OBHHHHHBO..',
+  '...OYYYO...OBHHHHHBO..',
+  '...OyyyO...OBBHHHBBO..',
+  '...OYYYO...OBBBBBBBO..',
+  '...OOPO..O.ObbbbbbbO..',
+  '..OOOPOOOOOOOOOOOOOO..',
+  '.OFffFFFFfFFfffFFFffO.',
+  '.OFFfFFFFFFfFFFfFFFFO.',
+  '.OssssssssssssssssssO.',
+  '..OOOOOOOOOOOOOOOOOO..',
+]
+const TREE_COLORS = {
+  O: '#7d6b5c', F: '#f1e6cf', f: '#fbf7ec', s: '#ddcca9', P: '#c9b28a', Y: '#e3c47c', y: '#bf9f55',
+  B: '#ecdfc2', b: '#d7c7a3', H: '#4a3b35', T: '#8c7a68', Q: '#e9a3a0',
+}
+const TREE_COLS = 22
+const TREE_ROWS = 32
+const PERCH_COL = 14.5 // centre of the big middle perch (art pixels from the left)
+const PERCH_ROW = 10 // its top surface (art pixels from the top)
+
+function CatTree({ x, scale }) {
+  return (
+    <svg className="pet-tree" style={{ left: x }} viewBox={`0 0 ${TREE_COLS} ${TREE_ROWS}`}
+      width={TREE_COLS * scale} height={TREE_ROWS * scale} shapeRendering="crispEdges" aria-hidden="true">
+      {pixels(TREE, TREE_COLORS)}
+    </svg>
+  )
+}
+
 // ---------- where the cat may walk ----------
 // Wide screens: only in the empty space left and right of the task column
 // (it walks *behind* the column to switch sides). Narrow screens: its own strip.
@@ -199,9 +254,10 @@ function getLayout(areaW) {
     const colLeft = (vw - COLUMN) / 2
     const colRight = colLeft + COLUMN
     const zones = [[12, colLeft - CAT_W - 12], [colRight + 12, vw - CAT_W - 12]].filter(([a, b]) => b > a)
-    return { wide: true, bedX: Math.max(12, colLeft - BED_W - 40), zones }
+    const bedX = Math.max(TREE_COLS * 3 + 24, colLeft - BED_W - 40)
+    return { wide: true, treeX: bedX - TREE_COLS * 3 - 16, treeScale: 3, bedX, zones }
   }
-  return { wide: false, bedX: 8, zones: [[0, areaW - CAT_W - 4]] }
+  return { wide: false, treeX: 6, treeScale: 2, bedX: 6 + TREE_COLS * 2 + 10, zones: [[0, areaW - CAT_W - 4]] }
 }
 
 const randomIn = ([a, b]) => a + Math.random() * (b - a)
@@ -218,6 +274,7 @@ export default function Pet({ treats, feedSignal }) {
   const [eating, setEating] = useState(false)
   const [hearts, setHearts] = useState(0) // bump to replay the hearts
   const [bubble, setBubble] = useState(false)
+  const [perched, setPerched] = useState(false) // sitting up on the cat tree
 
   const mood = treats >= 3 ? 'happy' : treats >= 1 ? 'content' : 'sleepy'
 
@@ -264,6 +321,7 @@ export default function Pet({ treats, feedSignal }) {
     if (dist > 1) setFacing(t > xRef.current ? 1 : -1)
     inBedRef.current = false
     setInBed(false)
+    setPerched(false)
     setDuration(dur)
     setWalking(dur > 0)
     walkingRef.current = dur > 0
@@ -285,6 +343,17 @@ export default function Pet({ treats, feedSignal }) {
     })
   }
 
+  // Wide screens: walk to the cat tree and hop up onto the big perch to sit.
+  // (On phones the perch would poke up over the task list, so it stays down.)
+  function climbTree() {
+    const l = layoutRef.current
+    if (!l.wide) return
+    walkTo(l.treeX + PERCH_COL * l.treeScale - 27, () => {
+      setFacing(-1)
+      setPerched(true)
+    })
+  }
+
   // Wander now and then. Sleepy: head to bed and stay there.
   useEffect(() => {
     if (reduceMotion()) return
@@ -297,6 +366,7 @@ export default function Pet({ treats, feedSignal }) {
       const r = Math.random()
       const chance = moodRef.current === 'content' ? 0.5 : 0.75
       if (r < 0.08) goToBed() // the occasional nap spot visit
+      else if (r < 0.2) climbTree()
       else if (r < chance) {
         const zones = layoutRef.current.zones
         walkTo(randomIn(zones[Math.floor(Math.random() * zones.length)]))
@@ -348,6 +418,7 @@ export default function Pet({ treats, feedSignal }) {
 
   return (
     <div className={`pet-area ${layout.wide ? 'wide' : 'strip'}`} ref={areaRef} aria-live="polite">
+      <CatTree x={layout.treeX} scale={layout.treeScale} />
       <Bed x={layout.bedX} />
 
       {food !== null && (
@@ -357,7 +428,7 @@ export default function Pet({ treats, feedSignal }) {
       )}
 
       <div
-        className={`pet face-${facing > 0 ? 'right' : 'left'} ${walking ? 'walking' : ''} ${eating ? 'eating' : ''} ${inBed && !walking ? 'in-bed' : ''} ${mood}`}
+        className={`pet face-${facing > 0 ? 'right' : 'left'} ${walking ? 'walking' : ''} ${eating ? 'eating' : ''} ${inBed && !walking ? 'in-bed' : ''} ${perched && !walking ? 'perched' : ''} ${mood}`}
         style={{ left: x, transitionDuration: `${duration}s` }}
       >
         {bubble && (

@@ -239,6 +239,8 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 }
 
 .pet-bed { position: absolute; bottom: 0; image-rendering: pixelated; }
+.pet-tree { position: absolute; bottom: 0; image-rendering: pixelated; }
+.pet.perched { bottom: 66px; } /* (32 - 10 art px) x 3: the big perch on wide screens */
 .pet-bed.front { z-index: 2; }
 .pet { z-index: 1; }
 .pet.in-bed { bottom: 7px; }
