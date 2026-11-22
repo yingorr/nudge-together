@@ -131,6 +131,12 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .prio-btn { border: 1px solid var(--border); background: transparent; border-radius: 999px;
   padding: 6px 10px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 .prio-btn::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--prio); }
+.time-btn { border: 1px solid var(--border); background: transparent; border-radius: 999px;
+  padding: 6px 10px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.time-btn.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
+.time-dots { font-size: 7px; letter-spacing: 1px; color: var(--accent); }
+.time-tag { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.time-tag span { font-size: 7px; letter-spacing: 1px; color: var(--accent); vertical-align: 1px; }
 .prio-btn.selected { border-color: var(--prio); background: color-mix(in srgb, var(--prio) 15%, transparent); font-weight: 600; }
 
 .chips { display: flex; gap: 6px; flex-wrap: wrap; }

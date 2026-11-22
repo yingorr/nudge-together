@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { categoryLabel, priorityColor } from '../lib/constants'
+import { categoryLabel, priorityColor, timeLabel, TIME_NEEDED } from '../lib/constants'
 import { daysUntil, formatDue, isOverdue } from '../lib/dates'
 import TaskFields from './TaskFields'
 
@@ -22,6 +22,7 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly }) {
       title: draft.title.trim(),
       category: draft.category,
       priority: draft.priority,
+      time_needed: draft.time_needed ?? null,
       due_date: draft.due_date,
     })
     setEditing(false)
@@ -38,6 +39,7 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly }) {
             category={draft.category}
             dueDate={draft.due_date}
             priority={draft.priority}
+            timeNeeded={draft.time_needed}
             onChange={(c) => setDraft({ ...draft, ...c })}
           />
           <div className="row between">
@@ -68,6 +70,12 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly }) {
         <span className="task-meta">
           <span className={`tag ${task.category}`}>{categoryLabel(task.category)}</span>
           {overdue && <span className="tag overdue">Overdue</span>}
+          {task.time_needed && (
+            <span className="time-tag" title={`${timeLabel(task.time_needed)} time needed`}>
+              <span aria-hidden="true">{'●'.repeat(TIME_NEEDED.find((t) => t.value === task.time_needed)?.dots ?? 0)}</span>
+              {' '}{timeLabel(task.time_needed)} time
+            </span>
+          )}
           {task.due_date && (
             <span className={overdue || dueSoon ? 'due soon' : 'due'}>{formatDue(task.due_date)}</span>
           )}

@@ -1,9 +1,10 @@
 import { CATEGORIES } from '../lib/constants'
 import PriorityPicker from './PriorityPicker'
+import TimePicker from './TimePicker'
 
 // The labeled category / due date / priority fields, shared by the add and edit forms.
 // iPhones show an empty date box with no hint text, so every field gets a visible label.
-export default function TaskFields({ category, dueDate, priority, onChange, idPrefix }) {
+export default function TaskFields({ category, dueDate, priority, timeNeeded, onChange, idPrefix }) {
   return (
     <div className="task-fields">
       <label className="field">
@@ -25,6 +26,10 @@ export default function TaskFields({ category, dueDate, priority, onChange, idPr
       <div className="field full" role="group" aria-labelledby={`${idPrefix}-prio`}>
         <span className="field-label" id={`${idPrefix}-prio`}>Priority <span className="muted">(optional)</span></span>
         <PriorityPicker value={priority} onChange={(p) => onChange({ priority: p })} />
+      </div>
+      <div className="field full" role="group" aria-labelledby={`${idPrefix}-time`}>
+        <span className="field-label" id={`${idPrefix}-time`}>Time needed <span className="muted">(optional)</span></span>
+        <TimePicker value={timeNeeded} onChange={(t) => onChange({ time_needed: t })} />
       </div>
     </div>
   )

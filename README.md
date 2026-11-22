@@ -9,7 +9,7 @@ each other accountable with friends.
 
 - Sign up / log in with email + password and a display name
 - Create, edit, delete tasks with a **name**, **category** (Personal / School / Work),
-  optional **priority** (color bar on the left: rose / golden / green) and required **due date**
+  optional **priority** (color bar on the left: rose / golden / green) required **due date** and optional **time needed** (low / medium / high)
 - Checkbox to mark complete; filter by category; hide/show finished tasks
 - In-app reminder banner with counts per section ("2 overdue · 1 due today · 3 this week · 1 next week & after")
 - Overdue tag on unfinished past-due tasks, with an Overdue filter that combines with the category filters
