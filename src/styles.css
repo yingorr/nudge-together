@@ -157,14 +157,14 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .friend-picker { flex-direction: row; align-items: center; justify-content: space-between;
   gap: 12px; color: var(--text); font-size: 15px; font-weight: 600; }
 .friend-picker select { flex: 0 1 220px; font-weight: 400; }
-.chip.select-chip { padding: 0; display: inline-flex; align-items: center; }
-.chip.select-chip select { border: 0; background: transparent; min-height: 0; height: auto; font-size: 13px;
-  padding: 6px 26px 6px 12px; border-radius: 999px; cursor: pointer; color: inherit;
-  -webkit-appearance: none; appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
-  background-position: calc(100% - 14px) 52%, calc(100% - 10px) 52%; background-size: 4px 4px; background-repeat: no-repeat; }
-/* iPhone zooms the page when a dropdown under 16px is tapped */
-@supports (-webkit-touch-callout: none) { .chip.select-chip select { font-size: 16px; padding-top: 4px; padding-bottom: 4px; } }
+.chip.select-chip { position: relative; display: inline-flex; flex-direction: row; align-items: center; gap: 6px;
+  cursor: pointer; color: var(--text); font-size: 13px; }
+.chip.select-chip .caret { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent;
+  border-top: 5px solid currentColor; opacity: 0.7; }
+/* the real dropdown: invisible, covering the chip, 16px so iPhone doesn't zoom */
+.chip.select-chip select { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; opacity: 0;
+  cursor: pointer; font-size: 16px; padding: 0; border: 0; }
+.chip.select-chip:focus-within { outline: 2px solid var(--highlight); outline-offset: 1px; }
 .chip.select-chip.active-soft { background: var(--accent-soft); color: var(--accent-text); border-color: var(--accent); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .chip.toggle.active { background: var(--accent-soft); color: var(--accent-text); border-color: var(--accent); }

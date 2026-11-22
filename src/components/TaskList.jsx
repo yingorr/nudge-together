@@ -74,11 +74,14 @@ export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false }
             {overdueOnly ? '✓ ' : ''}Overdue ({overdueCount})
           </button>
         )}
+        {/* The chip shows "Time: Medium"; an invisible native dropdown sits on top of it,
+            so the chip is only as wide as its words and the list just shows the options. */}
         <label className={`chip select-chip ${timeFilter !== 'any' ? 'active-soft' : ''}`}>
-          <span className="sr-only">Time needed</span>
+          <span aria-hidden="true">Time: {timeFilter === 'any' ? 'Any' : TIME_NEEDED.find((t) => t.value === timeFilter)?.label}</span>
+          <span className="caret" aria-hidden="true" />
           <select value={timeFilter} onChange={(e) => setTimeFilter(e.target.value)} aria-label="Filter by time needed">
-            <option value="any">Time: any</option>
-            {TIME_NEEDED.map((t) => <option key={t.value} value={t.value}>Time: {t.label.toLowerCase()}</option>)}
+            <option value="any">Any</option>
+            {TIME_NEEDED.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
           </select>
         </label>
         <button className={`chip toggle ${showingDone ? 'active' : ''}`} aria-pressed={showingDone}
