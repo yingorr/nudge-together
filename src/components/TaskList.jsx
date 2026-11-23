@@ -10,9 +10,13 @@ const SECTIONS = [
   { id: 'later', label: 'Next week & after' },
 ]
 
-// Soonest first; undated tasks keep newest-first order.
+// Soonest first; on the same day, high priority first (then medium, low, none);
+// then newest first.
+const PRIORITY_RANK = { high: 0, medium: 1, low: 2 }
+const rank = (t) => PRIORITY_RANK[t.priority] ?? 3
 const byDue = (a, b) =>
   (a.due_date ?? '9999').localeCompare(b.due_date ?? '9999') ||
+  rank(a) - rank(b) ||
   (b.created_at ?? '').localeCompare(a.created_at ?? '')
 
 // One collapsible date section. Open/closed is remembered per device.
