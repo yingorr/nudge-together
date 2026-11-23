@@ -22,6 +22,7 @@ export function formatDue(iso) {
   const days = daysUntil(iso)
   if (days === 0) return 'Due today'
   if (days === 1) return 'Due tomorrow'
+  if (days === 2) return 'Due in 2 days'
   const [y, m, d] = iso.split('-').map(Number)
   const label = new Date(y, m - 1, d).toLocaleDateString(undefined, {
     weekday: 'short',
