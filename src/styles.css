@@ -243,6 +243,15 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .check-btn.small { width: 30px; height: 30px; font-size: 15px; }
 .step-marker { width: 30px; height: 30px; flex-shrink: 0; display: grid; place-items: center; }
 .step-marker::before { content: ''; width: 10px; height: 10px; border-radius: 50%; border: 2px dashed var(--border); }
+.goal-fields { display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap; }
+.goal-fields > .field:first-child { flex: 1 1 100px; min-width: 100px; max-width: 160px; }
+.goal-fields .priority-picker.compact { height: 44px; align-items: center; }
+.goal-fields > .field:first-child select { padding-left: 10px; padding-right: 6px; }
+.priority-picker.compact { flex-wrap: nowrap; gap: 3px; }
+.priority-picker.compact .prio-btn, .priority-picker.compact .time-btn {
+  width: 31px; height: 31px; padding: 0; justify-content: center; gap: 0; }
+.priority-picker.compact .prio-btn::before { width: 12px; height: 12px; }
+.priority-picker.compact .time-btn .time-icon { width: 16px; height: 16px; }
 .step-rows { display: flex; flex-direction: column; gap: 8px; }
 .step-row { display: grid; grid-template-columns: 18px minmax(0, 1fr) 132px 36px; align-items: center; gap: 6px; }
 .step-row.head { margin-bottom: -4px; }

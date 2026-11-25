@@ -45,23 +45,23 @@ function GoalForm({ onCreate }) {
     <form className="card stack" onSubmit={submit}>
       <input className="title-input" value={title} onChange={(e) => setTitle(e.target.value)}
         placeholder="Goal name" maxLength={200} autoFocus aria-label="Goal name" />
-      <div className="task-fields">
+      <div className="goal-fields">
         <label className="field">
           <span className="field-label">Category</span>
           <select value={category} onChange={(e) => setCategory(e.target.value)}>
             {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
           </select>
         </label>
-        <div className="field full" role="group" aria-labelledby="goal-prio">
-          <span className="field-label" id="goal-prio">Priority <span className="muted">(optional)</span></span>
-          <PriorityPicker value={priority} onChange={setPriority} />
+        <div className="field" role="group" aria-labelledby="goal-prio">
+          <span className="field-label" id="goal-prio">Priority</span>
+          <PriorityPicker value={priority} onChange={setPriority} compact />
         </div>
-        <div className="field full" role="group" aria-labelledby="goal-time">
-          <span className="field-label" id="goal-time">Time needed <span className="muted">(optional)</span></span>
-          <TimePicker value={timeNeeded} onChange={setTimeNeeded} />
+        <div className="field" role="group" aria-labelledby="goal-time">
+          <span className="field-label" id="goal-time">Time</span>
+          <TimePicker value={timeNeeded} onChange={setTimeNeeded} compact />
         </div>
       </div>
-      <span className="muted small">Category, priority and time needed apply to every step; you can change a step on its own in My tasks.</span>
+      <span className="muted small">Priority and time needed are optional. All three apply to every step; you can change a step on its own in My tasks.</span>
 
       <div className="field">
         <span className="field-label">Steps, in order</span>
