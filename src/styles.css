@@ -11,7 +11,7 @@
   --accent-text: #2f5540; /* text on the soft tint */
   --highlight: #3f6b52;   /* logo, links, focus rings */
   --bubble-fill: #efe4cc; /* logo check bubble */
-  --sparkle: #e3a1a1;     /* logo sparkle */
+  --sparkle: #efb3be;     /* logo sparkle */
   --danger: #b42318;
   --error-bg: #fde8e6;
   --error-text: #8a1c12;
@@ -41,7 +41,7 @@
     --accent-text: #cfe3d4;
     --highlight: #9cc5a8;
     --bubble-fill: #2a3a30;
-    --sparkle: #e8939b;
+    --sparkle: #f6cdd4;
     --danger: #f87171;
     --error-bg: #3a1714;
     --error-text: #fecaca;
@@ -90,10 +90,12 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 
 .logo { font-size: 22px; margin: 0; color: var(--highlight); letter-spacing: -0.5px;
   font-family: 'Space Grotesk', Inter, system-ui, sans-serif; line-height: 0; }
-.logo-mark { display: inline-flex; align-items: center; gap: 10px; }
+.logo-mark { display: inline-flex; align-items: center; gap: 8px; }
+/* Phones: hide the display name so the one-line logo keeps its full size */
+@media (max-width: 430px) { .topbar-right .display-name { display: none; } }
 .logo-mark svg { display: block; image-rendering: pixelated; flex-shrink: 0; }
-.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.topbar-right { display: flex; align-items: center; gap: 8px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+.topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
 .tabs { display: flex; gap: 4px; background: var(--card); border: 1px solid var(--border);
   border-radius: 12px; padding: 4px; margin-bottom: 12px; }

@@ -1,4 +1,4 @@
-// Hand-drawn pixel wordmark: check bubble + "Nudge / Together" + two sparkles.
+// Hand-drawn pixel wordmark: check bubble + "Nudge Together" on one line + two sparkles.
 // Every glyph sits on a 9-row cell: rows 0-6 are cap height (baseline after row 6),
 // lowercase x-height is rows 2-6, and rows 7-8 hold descenders (the g).
 const GLYPHS = {
@@ -48,24 +48,25 @@ function grid(rows, colors, ox = 0, oy = 0) {
 }
 
 
-const LINE_GAP = 1 // extra rows between the two lines (descender of g already adds 2)
+const SPACE = 4 // cells between the two words
 
-export default function Logo({ px = 2.2, bold = 2 }) {
+export default function Logo({ px = 2, bold = 2 }) {
   const LINE1 = word('Nudge', bold)
   const LINE2 = word('Together', bold)
-  const w = LINE2.width + 4 // room for the second sparkle
-  const h = CELL_H * 2 + LINE_GAP
+  const x2 = LINE1.width + SPACE
+  const end = x2 + LINE2.width
+  const w = end + 8 // room for the two sparkles
   const ink = 'var(--highlight)'
   return (
     <span className="logo-mark" role="img" aria-label="Nudge Together">
       <svg viewBox="0 0 12 12" width={12 * px} height={12 * px} shapeRendering="crispEdges" aria-hidden="true">
         {grid(BUBBLE, { K: 'var(--text)', W: 'var(--bubble-fill)', S: ink })}
       </svg>
-      <svg viewBox={`0 -4 ${w + 2} ${h + 4}`} width={(w + 2) * px} height={(h + 4) * px} shapeRendering="crispEdges" aria-hidden="true">
+      <svg className="logo-word" viewBox={`0 -4 ${w} ${CELL_H + 4}`} width={w * px} height={(CELL_H + 4) * px} shapeRendering="crispEdges" aria-hidden="true">
         {LINE1.cells.map(([x, y]) => <rect key={`a${x}-${y}`} x={x} y={y} width="1" height="1" fill={ink} />)}
-        {LINE2.cells.map(([x, y]) => <rect key={`b${x}-${y}`} x={x} y={y + CELL_H + LINE_GAP} width="1" height="1" fill={ink} />)}
-        {grid(SPARK, { S: 'var(--sparkle)' }, LINE1.width + 2, -4)}
-        {grid(['.S.', 'SSS', '.S.'], { S: ink }, LINE2.width + 2, CELL_H + LINE_GAP + 2)}
+        {LINE2.cells.map(([x, y]) => <rect key={`b${x}-${y}`} x={x + x2} y={y} width="1" height="1" fill={ink} />)}
+        {grid(SPARK, { S: 'var(--sparkle)' }, end + 1, -4)}
+        {grid(['.S.', 'SSS', '.S.'], { S: ink }, end + 5, 2)}
       </svg>
     </span>
   )
