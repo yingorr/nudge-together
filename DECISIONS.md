@@ -157,8 +157,3 @@ the style of references, not copied from them.
 **It never covers your tasks.** On wide screens 宝宝 stays in the empty space beside
 the task list and passes behind it. On phones it has its own strip at the bottom, and
 the page leaves room for it. It respects the "reduce motion" setting.
-
-## Soft pixel skin (2026-11-25)
-- Cards, tabs, chips, buttons and inputs use stepped two-pixel corners: a 10x10 SVG drawn as a CSS `border-image`, one per stroke/fill color pair, swapped for dark mode (`--pf-*` variables at the end of `styles.css`). No drop shadows.
-- Round "mark done" and nudge buttons and the category tags keep their original shape.
-- Priority is three 4px dots, centered on the row. All text symbols (✎ ✕ ▸ ◎ ▾ and the time pie) are pixel icons.

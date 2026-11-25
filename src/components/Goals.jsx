@@ -93,7 +93,7 @@ function GoalForm({ onCreate }) {
               )}
               {steps.length > 1 ? (
                 <button type="button" className="icon-btn" aria-label={`Remove step ${i + 1}`}
-                  onClick={() => setSteps(steps.filter((_, j) => j !== i))}><PixelIcon name="x" size={10} /></button>
+                  onClick={() => setSteps(steps.filter((_, j) => j !== i))}>✕</button>
               ) : <span />}
             </div>
           ))}
@@ -204,7 +204,7 @@ function InsertStep({ after, onInsert }) {
           <span>days</span>
         </label>
         <button className="btn small" disabled={!title.trim()}>Add</button>
-        <button type="button" className="icon-btn" aria-label="Cancel" onClick={() => { setTitle(''); setOpen(false) }}><PixelIcon name="x" size={10} /></button>
+        <button type="button" className="icon-btn" aria-label="Cancel" onClick={() => { setTitle(''); setOpen(false) }}>✕</button>
       </form>
     </li>
   )
@@ -290,7 +290,7 @@ function GoalCard({ goal, steps, onUpdateTask, onDeleteTask, onUpdateGoal, onDel
               )}
             </span>
           </div>
-          <button className="icon-btn" aria-label="Edit goal" onClick={() => { setDraft(goalDraft()); setEditing(true) }}><PixelIcon name="pencil" size={13} /></button>
+          <button className="icon-btn" aria-label="Edit goal" onClick={() => { setDraft(goalDraft()); setEditing(true) }}>✎</button>
         </div>
       )}
 
@@ -338,7 +338,7 @@ function GoalCard({ goal, steps, onUpdateTask, onDeleteTask, onUpdateGoal, onDel
                   )}
                 </span>
               </div>
-              <button className="icon-btn" aria-label={`Edit "${s.title}"`} onClick={() => setEditingStep(s.id)}><PixelIcon name="pencil" size={13} /></button>
+              <button className="icon-btn" aria-label={`Edit "${s.title}"`} onClick={() => setEditingStep(s.id)}>✎</button>
             </li>
           ), insertAfter]
         })}

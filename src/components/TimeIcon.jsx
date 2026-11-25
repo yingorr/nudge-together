@@ -1,17 +1,15 @@
-// Pixel pie for "time needed": a quarter, half or full circle, drawn in the text color.
-const RING = ['..KKKK..', '.K....K.', 'K......K', 'K......K', 'K......K', 'K......K', '.K....K.', '..KKKK..']
-const filled = (level, x, y) =>
-  level === 'high' || (level === 'medium' && x >= 4) || (level === 'low' && x >= 4 && y < 4)
+// Pie icon for "time needed": a quarter, half or full circle.
+const FILL = {
+  low: <path d="M7 7 L7 1.5 A5.5 5.5 0 0 1 12.5 7 Z" />,
+  medium: <path d="M7 1.5 A5.5 5.5 0 0 1 7 12.5 Z" />,
+  high: <circle cx="7" cy="7" r="5.5" />,
+}
 
 export default function TimeIcon({ level, size = 14 }) {
-  const cells = []
-  RING.forEach((row, y) => [...row].forEach((c, x) => {
-    const inside = c === '.' && y > 0 && y < 7 && x > 0 && x < 7 && !((y === 1 || y === 6) && (x === 1 || x === 6))
-    if (c === 'K' || (inside && filled(level, x, y))) cells.push([x, y])
-  }))
   return (
-    <svg className="time-icon" viewBox="0 0 8 8" width={size} height={size} shapeRendering="crispEdges" aria-hidden="true">
-      {cells.map(([x, y]) => <rect key={`${x}-${y}`} x={x} y={y} width="1.02" height="1.02" fill="currentColor" />)}
+    <svg className="time-icon" viewBox="0 0 14 14" width={size} height={size} aria-hidden="true">
+      <circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" strokeWidth="1.4" />
+      <g fill="currentColor">{FILL[level]}</g>
     </svg>
   )
 }
