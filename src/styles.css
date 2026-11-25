@@ -356,7 +356,8 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .pet.in-bed { bottom: 7px; }
 .pet-area.strip > .pet.in-bed { bottom: calc(13px + env(safe-area-inset-bottom)); }
 .pet { position: absolute; bottom: 0; width: 72px; height: 54px;
-  transition-property: left; transition-timing-function: linear; }
+  /* walk sideways at its own pace; hop on/off the perch and bed quickly */
+  transition: left var(--walk, 0s) linear, bottom 0.25s ease-out; }
 .pet-btn { width: 72px; height: 54px; padding: 0; border: 0; background: none; cursor: pointer;
   pointer-events: auto; display: flex; align-items: flex-end; justify-content: flex-start; }
 /* keep the face in the same spot when switching poses */

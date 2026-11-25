@@ -317,10 +317,24 @@ export default function Pet({ treats, feedSignal }) {
     return () => window.removeEventListener('resize', measure)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Which walkable zone an x position is in (or nearest to).
+  function zoneIndexOf(x) {
+    const zones = layoutRef.current.zones
+    let best = 0
+    zones.forEach(([a, b], i) => {
+      const d = x < a ? a - x : x > b ? x - b : 0
+      const bd = (() => { const [ba, bb] = zones[best]; return x < ba ? ba - x : x > bb ? x - bb : 0 })()
+      if (d < bd) best = i
+    })
+    return best
+  }
+
   function walkTo(target, onArrive) {
     const t = Math.max(0, target)
     const dist = Math.abs(t - xRef.current)
-    const speed = moodRef.current === 'happy' ? 80 : moodRef.current === 'content' ? 55 : 30 // px per second
+    let speed = moodRef.current === 'happy' ? 80 : moodRef.current === 'content' ? 55 : 30 // px per second
+    // Crossing behind the task list (wide screens): trot, so it isn't hidden for long.
+    if (layoutRef.current.wide && zoneIndexOf(t) !== zoneIndexOf(xRef.current)) speed = Math.max(speed, 220)
     const dur = reduceMotion() ? 0 : dist / speed
     if (dist > 1) setFacing(t > xRef.current ? 1 : -1)
     inBedRef.current = false
@@ -363,6 +377,7 @@ export default function Pet({ treats, feedSignal }) {
     if (reduceMotion()) return
     const id = setInterval(() => {
       if (busyRef.current || walkingRef.current) return
+      if (document.hidden) return // don't wander while nobody is looking
       if (moodRef.current === 'sleepy') {
         if (!inBedRef.current) goToBed()
         return
@@ -372,8 +387,9 @@ export default function Pet({ treats, feedSignal }) {
       if (r < 0.08) goToBed() // the occasional nap spot visit
       else if (r < 0.2) climbTree()
       else if (r < chance) {
+        // Plain wandering stays on the side 宝宝 is already on (no trips behind the list).
         const zones = layoutRef.current.zones
-        walkTo(randomIn(zones[Math.floor(Math.random() * zones.length)]))
+        walkTo(randomIn(zones[zoneIndexOf(xRef.current)]))
       }
     }, 3500)
     return () => clearInterval(id)
@@ -433,7 +449,7 @@ export default function Pet({ treats, feedSignal }) {
 
       <div
         className={`pet face-${facing > 0 ? 'right' : 'left'} ${walking ? 'walking' : ''} ${eating ? 'eating' : ''} ${inBed && !walking ? 'in-bed' : ''} ${perched && !walking ? 'perched' : ''} ${mood}`}
-        style={{ left: x, transitionDuration: `${duration}s` }}
+        style={{ left: x, '--walk': `${duration}s` }}
       >
         {bubble && (
           <div className={`pet-bubble ${bubbleSide}`}>
