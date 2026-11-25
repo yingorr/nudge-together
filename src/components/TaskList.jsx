@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { CATEGORIES, TIME_NEEDED } from '../lib/constants'
 import { dateGroup, isOverdue } from '../lib/dates'
 import TaskItem from './TaskItem'
+import PixelIcon from './PixelIcon'
 
 const SECTIONS = [
   { id: 'overdue', label: 'Overdue' },
@@ -83,7 +84,7 @@ export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false, 
         {!showingDone && (
           <button className={`chip toggle overdue-chip ${overdueOnly ? 'active' : ''}`} aria-pressed={overdueOnly}
             onClick={() => setOverdueOnly(!overdueOnly)}>
-            {overdueOnly ? '✓ ' : ''}Overdue ({overdueCount})
+            {overdueOnly && <PixelIcon name="check" size={11} />}Overdue ({overdueCount})
           </button>
         )}
         {/* The chip shows "Time: Medium"; an invisible native dropdown sits on top of it,
@@ -98,7 +99,7 @@ export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false, 
         </label>
         <button className={`chip toggle ${showingDone ? 'active' : ''}`} aria-pressed={showingDone}
           onClick={() => setView(showingDone ? 'todo' : 'done')}>
-          {showingDone ? '✓ ' : ''}Done ({doneCount})
+          {showingDone && <PixelIcon name="check" size={11} />}Done ({doneCount})
         </button>
       </div>
 

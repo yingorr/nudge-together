@@ -4,6 +4,7 @@ import TimeIcon from './TimeIcon'
 import { daysUntil, formatDue, isOverdue } from '../lib/dates'
 import TaskFields from './TaskFields'
 import NudgeButton from './NudgeButton'
+import PixelIcon from './PixelIcon'
 
 export default function TaskItem({ task, onUpdate, onDelete, readOnly, nudged, onNudged, goal }) {
   const [editing, setEditing] = useState(false)
@@ -97,7 +98,7 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly, nudged, o
             aria-pressed={task.completed}
             aria-label={task.completed ? `Mark "${task.title}" not done` : `Mark "${task.title}" done`}
           >
-            ✓
+            <PixelIcon name="check" size={16} />
           </button>
         )}
       </div>

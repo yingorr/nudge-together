@@ -6,6 +6,7 @@ import { DEFAULT_DAYS, clampDays, currentStep, daysFor, stepsOf } from '../lib/g
 import ConfirmButton from './ConfirmButton'
 import PriorityPicker from './PriorityPicker'
 import TimePicker from './TimePicker'
+import PixelIcon from './PixelIcon'
 
 
 // ---------- new goal form ----------
@@ -324,7 +325,7 @@ function GoalCard({ goal, steps, onUpdateTask, onDeleteTask, onUpdateGoal, onDel
                 <span className="step-marker" aria-hidden="true" />
               ) : (
                 <button className={`check-btn small ${s.completed ? 'checked' : ''}`} onClick={() => toggle(s)}
-                  aria-pressed={s.completed} aria-label={s.completed ? `Mark "${s.title}" not done` : `Mark "${s.title}" done`}>✓</button>
+                  aria-pressed={s.completed} aria-label={s.completed ? `Mark "${s.title}" not done` : `Mark "${s.title}" done`}><PixelIcon name="check" size={14} /></button>
               )}
               <div className="step-body">
                 <span className="step-title">{s.title}</span>
