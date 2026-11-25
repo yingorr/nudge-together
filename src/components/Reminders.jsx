@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { dateGroup } from '../lib/dates'
+import PixelIcon from './PixelIcon'
 
 // In-app reminder banner: how many unfinished tasks are in each date section,
 // e.g. "2 overdue · 1 due today · 3 this week · 1 next week & after".
@@ -26,7 +27,7 @@ export default function Reminders({ tasks }) {
     <section className="reminders" role="status">
       <div className="row between">
         <div className="reminder-counts">
-          <span aria-hidden="true">🔔</span>
+          <span className="reminder-icon"><PixelIcon name="bang" size={18} /></span>
           {items.map((it) => (
             <span key={it.id} className={`reminder-count ${it.id === 'overdue' ? 'overdue' : ''}`}>{it.text}</span>
           ))}

@@ -134,8 +134,8 @@ category, priority and time needed are set once on the goal and copied onto each
 their tasks. That's enforced in the database, not just hidden in the app.
 
 **Nudges replace the checkmark on friends' tasks.** The checkmark did nothing there,
-so that spot became the way to check in: a speech bubble ("How's it going?") on
-unfinished tasks and a heart bubble ("Nice work!") on finished ones. Messages are
+so that spot became the way to check in: an alarm clock ("How's it going??") on
+unfinished tasks and a heart bubble ("Nice work!!") on finished ones. Messages are
 preset, which keeps them short, friendly and safe from misuse. After you nudge, the
 button shows a dot for 24 hours, but you can still send another.
 
