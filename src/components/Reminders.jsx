@@ -32,7 +32,7 @@ export default function Reminders({ tasks }) {
             <span key={it.id} className={`reminder-count ${it.id === 'overdue' ? 'overdue' : ''}`}>{it.text}</span>
           ))}
         </div>
-        <button className="icon-btn" onClick={() => setHidden(true)} aria-label="Hide reminders">✕</button>
+        <button className="icon-btn" onClick={() => setHidden(true)} aria-label="Hide reminders"><PixelIcon name="x" size={10} /></button>
       </div>
     </section>
   )

@@ -11,6 +11,13 @@ const ICONS = {
     '...TTTTTT...', '.TTWWWWWWTT.', 'TWWWXXXXWWWT', 'TWWXXWWXXWWT', 'TWWWWWXXWWWT', 'TWWWWXXWWWWT',
     'TWWWWWWWWWWT', 'TWWWWXXWWWWT', '.TTWWWWWWTT.', '..TWTTTTTT..', '..TT........', '..T.........',
   ],
+  // edit: slanted pencil in two grays (eraser and wood tip paler than the body)
+  pencil: ['......QQ', '.....QQQ', '....MMQ.', '...MMM..', '..MMM...', '.QMM....', '.QQ.....', 'D.......'],
+  x: ['T...T', '.T.T.', '..T..', '.T.T.', 'T...T'],
+  chev: ['T..', 'TT.', 'TTT', 'TT.', 'T..'],
+  caret: ['TTTTT', '.TTT.', '..T..'],
+  goal: ['GGG', 'G.G', 'GGG'],
+  sparkle: ['..S..', '..S..', 'SS.SS', '..S..', '..S..'],
   // round bubble with an x: log out
   logout: ['..TTTTTT..', '.TWWWWWWT.', 'TWWWWWWWWT', 'TWWTWWTWWT', 'TWWWTTWWWT', 'TWWWTTWWWT', 'TWWTWWTWWT', 'TWWWWWWWWT', '.TWWWWWWT.', '..TTTTTT..'],
   // single paw print: show / hide 宝宝 (drawn in the button's text color)
@@ -23,7 +30,8 @@ const ICONS = {
   ],
 }
 // Outline and dots follow the theme's sage (lighter in dark mode); T = current text color.
-const COLORS = { K: 'var(--accent)', G: 'var(--accent)', W: '#efe4cc', R: '#e07a8a', T: 'currentColor', X: '#d64545' }
+const COLORS = { K: 'var(--accent)', G: 'var(--accent)', W: '#efe4cc', R: '#e07a8a', T: 'currentColor', X: '#d64545',
+  M: 'var(--muted)', Q: 'var(--pencil-pale)', D: 'var(--text)', S: 'var(--sparkle)' }
 
 export default function PixelIcon({ name, size = 24 }) {
   const rows = ICONS[name]

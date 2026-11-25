@@ -73,7 +73,7 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly, nudged, o
         <span className="task-meta">
           <span className={`tag ${task.category}`}>{categoryLabel(task.category)}</span>
           {overdue && <span className="tag overdue">Overdue</span>}
-          {goal && <span className="goal-tag" title={`Step of the goal "${goal.title}"`}>◎ {goal.title}</span>}
+          {goal && <span className="goal-tag" title={`Step of the goal "${goal.title}"`}><PixelIcon name="goal" size={6} />{goal.title}</span>}
           {task.time_needed && (
             <span className="time-tag" title={`${timeLabel(task.time_needed)} time needed`}
               role="img" aria-label={`${timeLabel(task.time_needed)} time needed`}>
@@ -87,7 +87,7 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly, nudged, o
       </div>
       <div className="task-actions">
         {!readOnly && (
-          <button className="icon-btn" onClick={() => { setDraft(task); setEditing(true) }} aria-label="Edit">✎</button>
+          <button className="icon-btn" onClick={() => { setDraft(task); setEditing(true) }} aria-label="Edit"><PixelIcon name="pencil" size={13} /></button>
         )}
         {readOnly ? (
           <NudgeButton task={task} sentRecently={nudged} onSent={onNudged} />

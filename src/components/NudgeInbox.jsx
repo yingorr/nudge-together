@@ -49,7 +49,7 @@ export default function NudgeInbox({ userId }) {
               <span><strong>{n.from?.display_name ?? 'A friend'}</strong>: {n.message}</span>
               {n.task?.title && <span className="muted small">on “{n.task.title}”</span>}
             </div>
-            <button className="icon-btn" onClick={() => dismiss([n.id])} aria-label="Dismiss">✕</button>
+            <button className="icon-btn" onClick={() => dismiss([n.id])} aria-label="Dismiss"><PixelIcon name="x" size={10} /></button>
           </li>
         ))}
       </ul>

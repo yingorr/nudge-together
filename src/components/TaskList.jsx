@@ -33,8 +33,8 @@ function Section({ id, label, tasks, storeKey, children }) {
   return (
     <div className={`task-section ${id}`}>
       <button className="section-bar" aria-expanded={open} onClick={() => setOpen(!open)}>
-        <span>{label} <span className="section-count">{tasks.length}</span></span>
-        <span className={`chevron ${open ? 'open' : ''}`} aria-hidden="true">▸</span>
+        <span className="section-label"><PixelIcon name="sparkle" size={9} />{label} <span className="section-count">{tasks.length}</span></span>
+        <span className={`chevron ${open ? 'open' : ''}`} aria-hidden="true"><PixelIcon name="chev" size={9} /></span>
       </button>
       {open && <ul className="task-list">{children}</ul>}
     </div>
@@ -91,7 +91,7 @@ export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false, 
             so the chip is only as wide as its words and the list just shows the options. */}
         <label className={`chip select-chip ${timeFilter !== 'any' ? 'active-soft' : ''}`}>
           <span aria-hidden="true">Time: {timeFilter === 'any' ? 'Any' : TIME_NEEDED.find((t) => t.value === timeFilter)?.label}</span>
-          <span className="caret" aria-hidden="true" />
+          <PixelIcon name="caret" size={8} />
           <select value={timeFilter} onChange={(e) => setTimeFilter(e.target.value)} aria-label="Filter by time needed">
             <option value="any">Any</option>
             {TIME_NEEDED.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
