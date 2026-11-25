@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../supabaseClient'
+import Logo from './Logo'
 
 export default function Auth() {
   const [mode, setMode] = useState('login') // 'login' | 'signup'
@@ -35,7 +36,7 @@ export default function Auth() {
 
   return (
     <main className="center-card">
-      <h1 className="logo">Nudge Together</h1>
+      <h1 className="logo"><Logo /></h1>
       <p className="muted">Small steps, shared with friends.</p>
 
       <form onSubmit={handleSubmit} className="stack">

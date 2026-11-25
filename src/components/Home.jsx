@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
+import Logo from './Logo'
 import TaskForm from './TaskForm'
 import TaskList from './TaskList'
 import Reminders from './Reminders'
@@ -226,7 +227,7 @@ export default function Home({ session }) {
     <>
     <div className={`app ${showPet ? 'with-pet' : ''}`}>
       <header className="topbar">
-        <h1 className="logo">Nudge Together</h1>
+        <h1 className="logo"><Logo /></h1>
         <div className="topbar-right">
           <span className="muted small">{profile?.display_name}</span>
           <button className={`icon-btn pet-toggle ${showPet ? '' : 'off'}`} onClick={() => setShowPet(!showPet)}
