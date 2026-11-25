@@ -39,10 +39,10 @@ export default function NudgeButton({ task, sentRecently, onSent }) {
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-label={task.completed ? `Cheer on "${task.title}"` : `Nudge about "${task.title}"`}
-        title={done ? 'Nudged recently. Tap to send another' : task.completed ? 'Send a treat' : 'Send a nudge'}
+        title={done ? 'Nudged recently. Tap to send another' : task.completed ? 'Send a cheer' : 'Send a nudge'}
         disabled={status === 'sending'}
       >
-        <PixelIcon name={task.completed ? 'fish' : 'paw'} size={22} />
+        <PixelIcon name={task.completed ? 'cheer' : 'checkin'} size={22} />
         {done && <span className="nudge-sent-dot" aria-hidden="true" />}
       </button>
       {open && (

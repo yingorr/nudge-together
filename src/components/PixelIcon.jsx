@@ -1,36 +1,37 @@
-// Small pixel icons drawn in the same style as 宝宝:
-// a paw (nudge a friend) and a fish treat (cheer a finished task).
+// Small pixel speech bubbles for checking in on friends:
+// "…" = how's it going? (unfinished task), heart = nice work (finished task).
 const ICONS = {
-  paw: [
-    '...KK..KK...',
-    '..KPPK.KPPK.',
-    '..KPPKKKPPK.',
-    'KK.KK..KK.KK',
-    'KPPK....KPPK',
-    'KPPK.KK.KPPK',
-    '.KK.KPPK.KK.',
-    '...KPPPPK...',
-    '..KPPPPPPK..',
-    '..KPPPPPPK..',
-    '...KPPPPK...',
-    '....KKKK....',
+  checkin: [
+    '............',
+    '..KKKKKKKK..',
+    '.KWWWWWWWWK.',
+    'KWWWWWWWWWWK',
+    'KWWWWWWWWWWK',
+    'KWGGWGGWGGWK',
+    'KWGGWGGWGGWK',
+    'KWWWWWWWWWWK',
+    '.KWWWWWWWWK.',
+    '..KKWKKKKK..',
+    '..KWK.......',
+    '..KK........',
   ],
-  fish: [
+  cheer: [
     '............',
-    '....KKKK..K.',
-    '..KKLLLLKKLK',
-    '.KLLLLLLLKLK',
-    'KLWKLLMLLLKK',
-    'KLKKLMLMLLK.',
-    '.KLLLLMLLLKK',
-    '..KKLLLLKKLK',
-    '....KKKK.KLK',
-    '..........K.',
-    '............',
-    '............',
+    '..KKKKKKKK..',
+    '.KWWWWWWWWK.',
+    'KWWRRWWRRWWK',
+    'KWRRRRRRRRWK',
+    'KWRRRRRRRRWK',
+    'KWWRRRRRRWWK',
+    'KWWWRRRRWWWK',
+    '.KWWWRRWWWK.',
+    '..KKWKKKKK..',
+    '..KWK.......',
+    '..KK........',
   ],
 }
-const COLORS = { K: '#2a292e', P: '#ee9aa0', L: '#86b6d9', M: '#5d8fb8', W: '#ffffff' }
+// Outline and dots follow the theme's sage (lighter in dark mode).
+const COLORS = { K: 'var(--accent)', G: 'var(--accent)', W: '#fffdf7', R: '#e07a8a' }
 
 export default function PixelIcon({ name, size = 24 }) {
   const rows = ICONS[name]

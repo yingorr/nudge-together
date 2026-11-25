@@ -17,7 +17,7 @@ each other accountable with friends.
 - Friends: send requests by email (private lookup, emails aren't listed), accept/decline, remove
 - "Show friends' tasks" switch + dropdown to view a friend's tasks (read-only) with a progress bar
 - 宝宝 the cat: wanders beside the task list (its own strip at the bottom on phones), naps in its bed, eats a treat for every finished task, and gets sleepier or happier based on tasks done in the last 24 hours (tap for stats, 🐾 to hide)
-- Nudges: on a friend's task, tap the paw to send a quick check-in (or the fish treat to cheer a finished one); they see it live on their page
+- Nudges: on a friend's task, tap the speech bubble to send a quick check-in (or the heart bubble to cheer a finished one); they see it live on their page
 - Live sync across devices (check a task on your phone, it updates on your laptop)
 - Mobile-friendly layout, dark mode
 

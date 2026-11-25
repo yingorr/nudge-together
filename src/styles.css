@@ -229,7 +229,6 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .nudge { position: relative; }
 .pixel-icon { image-rendering: pixelated; display: block; }
 .inbox-title { display: inline-flex; align-items: center; gap: 8px; }
-@media (prefers-color-scheme: dark) { .pixel-icon { filter: drop-shadow(0 0 1px rgba(239, 235, 223, 0.5)); } }
 .nudge-btn { position: relative; width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border);
   background: transparent; font-size: 16px; cursor: pointer; display: grid; place-items: center; padding: 0; }
 .nudge-btn:hover { border-color: var(--highlight); }
