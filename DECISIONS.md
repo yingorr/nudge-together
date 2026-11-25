@@ -163,5 +163,5 @@ the page leaves room for it. It respects the "reduce motion" setting.
 - Kept: the dotted pixel line between task sections, the gray pixel pencil for edit, and the pixel pie for "time needed".
 
 ## Time needed = 1-3 dots (2026-11-25)
-- The left marker on tasks and goal steps is now 1-3 pixel dots: the count is time needed (low/medium/high), the color is priority (gray when no priority). No time set = no dots. Always vertically centered on the row.
+- The left marker on tasks and goal steps is now 1-3 pixel dots: the count is time needed (low/medium/high), the color is priority (gray when no priority). Priority but no time = one thin dash (~2.5 dots tall). Neither = nothing. Always vertically centered on the row.
 - The pie icons are gone. The time picker is three dots picked like a rating (tap the 3rd and the first two fill too; tap the current one again to clear).

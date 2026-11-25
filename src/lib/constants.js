@@ -30,8 +30,12 @@ export const timeLabel = (t) => TIME_NEEDED.find((x) => x.value === t)?.label ??
 export const timeDots = (t) => ({ low: 1, medium: 2, high: 3 })[t] ?? 0
 export const DOT_NONE = 'color-mix(in srgb, var(--muted) 45%, transparent)' // dots when no priority is set
 // CSS variables for the dot column on the left of a task or goal step.
+// Priority but no time needed: one thin dash, about the height of two and a half dots.
 export const dotStyle = (priority, time) => {
   const n = timeDots(time)
+  if (!n && priority) {
+    return { '--prio': priorityColor(priority), '--dots-h': '12px', '--dots-w': '2px', '--dots-x': '1px', '--dots-bg': 'var(--prio)' }
+  }
   return {
     '--prio': priority ? priorityColor(priority) : DOT_NONE,
     '--dots-h': `${n ? n * 4 + (n - 1) * 2 : 0}px`,
