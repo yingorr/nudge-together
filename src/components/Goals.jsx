@@ -45,6 +45,7 @@ function GoalForm({ onCreate }) {
     <form className="card stack" onSubmit={submit}>
       <input className="title-input" value={title} onChange={(e) => setTitle(e.target.value)}
         placeholder="Goal name" maxLength={200} autoFocus aria-label="Goal name" />
+      <span className="muted small goal-form-note">These apply to every step (priority and time are optional). You can change a step on its own in My tasks.</span>
       <div className="goal-fields">
         <label className="field">
           <span className="field-label">Category</span>
@@ -52,16 +53,15 @@ function GoalForm({ onCreate }) {
             {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
           </select>
         </label>
-        <div className="field" role="group" aria-labelledby="goal-prio">
+        <div className="field centered" role="group" aria-labelledby="goal-prio">
           <span className="field-label" id="goal-prio">Priority</span>
           <PriorityPicker value={priority} onChange={setPriority} compact />
         </div>
-        <div className="field" role="group" aria-labelledby="goal-time">
+        <div className="field centered" role="group" aria-labelledby="goal-time">
           <span className="field-label" id="goal-time">Time</span>
           <TimePicker value={timeNeeded} onChange={setTimeNeeded} compact />
         </div>
       </div>
-      <span className="muted small">Priority and time needed are optional. All three apply to every step; you can change a step on its own in My tasks.</span>
 
       <div className="field">
         <span className="field-label">Steps, in order</span>
