@@ -187,8 +187,10 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
   padding: 12px 4px 12px 16px; border-bottom: 1px solid var(--border); }
 .task:last-child { border-bottom: 0; }
 /* Priority bar on the far left (transparent when no priority is set). */
-.task::before { content: ''; position: absolute; left: 0; top: 14px; height: 18px; /* short bar beside the title */
-  width: 5px; border-radius: 999px; background: var(--prio, transparent); }
+.task::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  /* 1-3 pixel dots = time needed, colored by priority; always centered on the row */
+  width: 4px; height: var(--dots-h, 0px);
+  background: repeating-linear-gradient(to bottom, var(--prio, transparent) 0 4px, transparent 4px 6px); }
 .task.editing { display: block; }
 .task.done::before { opacity: 0.4; }
 .task-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -288,8 +290,9 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .add-step { align-self: flex-start; }
 .add-step-row input { min-height: 40px; }
 .goal-step { position: relative; }
-.goal-step:not(.editing)::before { content: ''; position: absolute; left: -10px; top: 14px; height: 16px; width: 4px;
-  border-radius: 999px; background: var(--prio, transparent); }
+.goal-step:not(.editing)::before { content: ''; position: absolute; left: -10px; top: 50%; transform: translateY(-50%);
+  width: 4px; height: var(--dots-h, 0px);
+  background: repeating-linear-gradient(to bottom, var(--prio, transparent) 0 4px, transparent 4px 6px); }
 .goal-step.done::before { opacity: 0.4; }
 .goal-step.editing { display: block; padding: 12px 0; }
 .step-meta { display: inline-flex; align-items: center; gap: 6px; }
@@ -453,3 +456,19 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); }
 
 .icon-btn .pixel-icon { display: inline-block; vertical-align: middle; }
+
+/* Time needed picker: three pixel dots, filled up to the chosen level */
+.time-dots-picker { display: flex; align-items: center; gap: 2px; min-height: 44px; }
+.time-dots-picker.compact { min-height: 31px; }
+.time-dot { width: 28px; height: 36px; padding: 0; border: 0; background: none; cursor: pointer;
+  display: grid; place-items: center; }
+.time-dot span { width: 12px; height: 12px; box-shadow: inset 0 0 0 2px var(--border); }
+.time-dot:hover span { box-shadow: inset 0 0 0 2px var(--highlight); }
+.time-dot.on span { background: var(--accent); box-shadow: none; }
+.time-dot:focus-visible { outline: 2px solid var(--highlight); outline-offset: -2px; }
+.time-dots-label { font-size: 13px; color: var(--muted); margin-left: 6px; }
+.time-dots-picker.compact .time-dot { width: 22px; height: 31px; }
+.time-dots-picker.compact .time-dot span { width: 10px; height: 10px; }
+/* small inline dots for a goal's time needed */
+.inline-dot { display: inline-block; width: 4px; height: 4px; background: var(--muted); }
+.time-tag:has(.inline-dot) { gap: 2px; }

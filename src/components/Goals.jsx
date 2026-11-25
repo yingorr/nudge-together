@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { CATEGORIES, categoryLabel, priorityColor, timeLabel } from '../lib/constants'
-import TimeIcon from './TimeIcon'
+import { CATEGORIES, categoryLabel, priorityColor, timeLabel, dotStyle, timeDots } from '../lib/constants'
 import { formatDue, todayISO } from '../lib/dates'
 import { DEFAULT_DAYS, clampDays, currentStep, daysFor, stepsOf } from '../lib/goals'
 import ConfirmButton from './ConfirmButton'
@@ -285,7 +284,7 @@ function GoalCard({ goal, steps, onUpdateTask, onDeleteTask, onUpdateGoal, onDel
               )}
               {goal.time_needed && (
                 <span className="time-tag" role="img" aria-label={`${timeLabel(goal.time_needed)} time needed`}>
-                  <TimeIcon level={goal.time_needed} size={13} />
+                  {Array.from({ length: timeDots(goal.time_needed) }, (_, i) => <i key={i} className="inline-dot" />)}
                 </span>
               )}
             </span>
@@ -320,7 +319,7 @@ function GoalCard({ goal, steps, onUpdateTask, onDeleteTask, onUpdateGoal, onDel
           }
           const days = daysFor(s, goal)
           return [(
-            <li key={s.id} className={`goal-step ${state}`} style={{ '--prio': priorityColor(s.priority) }}>
+            <li key={s.id} className={`goal-step ${state}`} style={dotStyle(s.priority, s.time_needed)}>
               {state === 'waiting' ? (
                 <span className="step-marker" aria-hidden="true" />
               ) : (
@@ -331,11 +330,6 @@ function GoalCard({ goal, steps, onUpdateTask, onDeleteTask, onUpdateGoal, onDel
                 <span className="step-title">{s.title}</span>
                 <span className="step-meta muted small">
                   <span>{s.completed ? 'Done' : s.due_date ? formatDue(s.due_date) : `Waiting · ${days} day${days === 1 ? '' : 's'}`}</span>
-                  {s.time_needed && (
-                    <span className="time-tag" role="img" aria-label={`${timeLabel(s.time_needed)} time needed`}>
-                      <TimeIcon level={s.time_needed} size={12} />
-                    </span>
-                  )}
                 </span>
               </div>
               <button className="icon-btn" aria-label={`Edit "${s.title}"`} onClick={() => setEditingStep(s.id)}><PixelIcon name="pencil" size={13} /></button>

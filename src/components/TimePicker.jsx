@@ -1,24 +1,26 @@
-import { TIME_NEEDED } from '../lib/constants'
-import TimeIcon from './TimeIcon'
+import { TIME_NEEDED, timeDots } from '../lib/constants'
 
-// Optional time needed: tap to set, tap again to clear (same feel as priority).
+// Optional time needed, picked like a rating: three pixel dots, tap 1-3.
+// Tapping the third fills the first two as well; tapping the current level again clears it.
 export default function TimePicker({ value, onChange, compact = false }) {
+  const filled = timeDots(value)
+  const current = TIME_NEEDED.find((t) => t.value === value)
   return (
-    <div className={`priority-picker time-picker ${compact ? 'compact' : ''}`}>
-      {TIME_NEEDED.map((t) => (
+    <div className={`time-dots-picker ${compact ? 'compact' : ''}`} role="group" aria-label="Time needed">
+      {TIME_NEEDED.map((t, i) => (
         <button
           key={t.value}
           type="button"
+          className={`time-dot ${i < filled ? 'on' : ''}`}
           title={`${t.label} time needed`}
           aria-label={`${t.label} time needed`}
           aria-pressed={value === t.value}
-          className={`time-btn ${value === t.value ? 'selected' : ''}`}
           onClick={() => onChange(value === t.value ? null : t.value)}
         >
-          <TimeIcon level={t.value} />
-          {!compact && t.label}
+          <span />
         </button>
       ))}
+      {!compact && <span className="time-dots-label">{current ? current.label : 'Not set'}</span>}
     </div>
   )
 }

@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { categoryLabel, priorityColor, timeLabel } from '../lib/constants'
-import TimeIcon from './TimeIcon'
+import { categoryLabel, timeLabel, dotStyle } from '../lib/constants'
 import { daysUntil, formatDue, isOverdue } from '../lib/dates'
 import TaskFields from './TaskFields'
 import NudgeButton from './NudgeButton'
@@ -11,7 +10,7 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly, nudged, o
   const [draft, setDraft] = useState(task)
 
   // The colored bar on the far left shows priority (none = no bar).
-  const barStyle = { '--prio': priorityColor(editing ? draft.priority : task.priority) }
+  const barStyle = dotStyle(editing ? draft.priority : task.priority, editing ? draft.time_needed : task.time_needed)
 
   function toggleDone() {
     const completed = !task.completed
@@ -67,19 +66,13 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly, nudged, o
 
   return (
     <li className={`task ${task.completed ? 'done' : ''}`} style={barStyle}
-      title={task.priority ? `${task.priority} priority` : undefined}>
+      title={[task.priority && `${task.priority} priority`, task.time_needed && `${timeLabel(task.time_needed).toLowerCase()} time needed`].filter(Boolean).join(' · ') || undefined}>
       <div className="task-body">
         <span className="task-title">{task.title}</span>
         <span className="task-meta">
           <span className={`tag ${task.category}`}>{categoryLabel(task.category)}</span>
           {overdue && <span className="tag overdue">Overdue</span>}
           {goal && <span className="goal-tag" title={`Step of the goal "${goal.title}"`}>◎ {goal.title}</span>}
-          {task.time_needed && (
-            <span className="time-tag" title={`${timeLabel(task.time_needed)} time needed`}
-              role="img" aria-label={`${timeLabel(task.time_needed)} time needed`}>
-              <TimeIcon level={task.time_needed} size={13} />
-            </span>
-          )}
           {task.due_date && (
             <span className={overdue || dueSoon ? 'due soon' : 'due'}>{formatDue(task.due_date)}</span>
           )}

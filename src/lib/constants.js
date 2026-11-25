@@ -25,3 +25,15 @@ export const TIME_NEEDED = [
 ]
 
 export const timeLabel = (t) => TIME_NEEDED.find((x) => x.value === t)?.label ?? null
+
+// "Time needed" is shown as 1-3 pixel dots (low / medium / high), colored by priority.
+export const timeDots = (t) => ({ low: 1, medium: 2, high: 3 })[t] ?? 0
+export const DOT_NONE = 'color-mix(in srgb, var(--muted) 45%, transparent)' // dots when no priority is set
+// CSS variables for the dot column on the left of a task or goal step.
+export const dotStyle = (priority, time) => {
+  const n = timeDots(time)
+  return {
+    '--prio': priority ? priorityColor(priority) : DOT_NONE,
+    '--dots-h': `${n ? n * 4 + (n - 1) * 2 : 0}px`,
+  }
+}
