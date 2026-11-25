@@ -3,8 +3,9 @@ import { categoryLabel, priorityColor, timeLabel } from '../lib/constants'
 import TimeIcon from './TimeIcon'
 import { daysUntil, formatDue, isOverdue } from '../lib/dates'
 import TaskFields from './TaskFields'
+import NudgeButton from './NudgeButton'
 
-export default function TaskItem({ task, onUpdate, onDelete, readOnly }) {
+export default function TaskItem({ task, onUpdate, onDelete, readOnly, nudged, onNudged }) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(task)
 
@@ -86,15 +87,18 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly }) {
         {!readOnly && (
           <button className="icon-btn" onClick={() => { setDraft(task); setEditing(true) }} aria-label="Edit">✎</button>
         )}
-        <button
-          className={`check-btn ${task.completed ? 'checked' : ''}`}
-          onClick={toggleDone}
-          disabled={readOnly}
-          aria-pressed={task.completed}
-          aria-label={task.completed ? `Mark "${task.title}" not done` : `Mark "${task.title}" done`}
-        >
-          ✓
-        </button>
+        {readOnly ? (
+          <NudgeButton task={task} sentRecently={nudged} onSent={onNudged} />
+        ) : (
+          <button
+            className={`check-btn ${task.completed ? 'checked' : ''}`}
+            onClick={toggleDone}
+            aria-pressed={task.completed}
+            aria-label={task.completed ? `Mark "${task.title}" not done` : `Mark "${task.title}" done`}
+          >
+            ✓
+          </button>
+        )}
       </div>
     </li>
   )

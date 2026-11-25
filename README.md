@@ -17,6 +17,7 @@ each other accountable with friends.
 - Friends: send requests by email (private lookup, emails aren't listed), accept/decline, remove
 - "Show friends' tasks" switch + dropdown to view a friend's tasks (read-only) with a progress bar
 - 宝宝 the cat: wanders beside the task list (its own strip at the bottom on phones), naps in its bed, eats a treat for every finished task, and gets sleepier or happier based on tasks done in the last 24 hours (tap for stats, 🐾 to hide)
+- Nudges: on a friend's task, tap 👋 to send a quick check-in (or 🎉 to cheer a finished one); they see it live on their page
 - Live sync across devices (check a task on your phone, it updates on your laptop)
 - Mobile-friendly layout, dark mode
 
@@ -85,6 +86,7 @@ already run, so each runs exactly once.
 | `20261120043000_grant_table_access.sql` | Lets logged-in users reach the tables (rules still apply) |
 | `20261122201500_require_due_date.sql` | Every task must have a due date |
 | `20261122203500_time_needed.sql` | Optional "time needed" (low / medium / high) |
+| `20261125050000_nudges.sql` | Nudges: friends checking in on each other's tasks |
 
 **To change the database:** add a new file named `YYYYMMDDHHMMSS_short_description.sql`
 (`npx supabase migration new short_description` creates one), write the SQL, then run

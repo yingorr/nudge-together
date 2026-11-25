@@ -40,7 +40,7 @@ function Section({ id, label, tasks, storeKey, children }) {
   )
 }
 
-export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false }) {
+export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false, nudgedIds, onNudged }) {
   const [filter, setFilter] = useState('all')
   const [overdueOnly, setOverdueOnly] = useState(false)
   const [timeFilter, setTimeFilter] = useState('any') // 'any' | 'low' | 'medium' | 'high'
@@ -108,7 +108,8 @@ export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false }
       ) : showingDone ? (
         <ul className="task-list">
           {doneList.map((t) => (
-            <TaskItem key={t.id} task={t} onUpdate={onUpdate} onDelete={onDelete} readOnly={readOnly} />
+            <TaskItem key={t.id} task={t} onUpdate={onUpdate} onDelete={onDelete} readOnly={readOnly}
+                  nudged={nudgedIds?.has(t.id)} onNudged={onNudged} />
           ))}
         </ul>
       ) : (
@@ -116,7 +117,8 @@ export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false }
           {SECTIONS.filter((s) => groups[s.id].length > 0).map((s) => (
             <Section key={s.id} {...s} tasks={groups[s.id]} storeKey={readOnly ? 'friend' : 'mine'}>
               {groups[s.id].sort(byDue).map((t) => (
-                <TaskItem key={t.id} task={t} onUpdate={onUpdate} onDelete={onDelete} readOnly={readOnly} />
+                <TaskItem key={t.id} task={t} onUpdate={onUpdate} onDelete={onDelete} readOnly={readOnly}
+                  nudged={nudgedIds?.has(t.id)} onNudged={onNudged} />
               ))}
             </Section>
           ))}

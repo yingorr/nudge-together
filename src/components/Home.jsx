@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient'
 import TaskForm from './TaskForm'
 import TaskList from './TaskList'
 import Reminders from './Reminders'
+import NudgeInbox from './NudgeInbox'
 import Friends from './Friends'
 import FriendsPanel from './FriendsPanel'
 import Pet from './Pet'
@@ -132,6 +133,7 @@ export default function Home({ session }) {
 
       {tab === 'tasks' && (
         <main className="stack">
+          <NudgeInbox userId={userId} />
           <Reminders tasks={tasks} />
           <TaskForm onAdd={addTask} />
           <TaskList tasks={tasks} onUpdate={updateTask} onDelete={deleteTask} />

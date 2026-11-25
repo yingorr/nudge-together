@@ -6,6 +6,7 @@ import TaskList from './TaskList'
 // because you're accepted friends (see "read own or friends tasks" policy).
 export default function FriendView({ friend }) {
   const [tasks, setTasks] = useState(null)
+  const [nudgedIds, setNudgedIds] = useState(new Set()) // tasks you nudged in the last 24h
 
   useEffect(() => {
     let active = true
@@ -17,6 +18,13 @@ export default function FriendView({ friend }) {
       .order('completed', { ascending: true })
       .order('due_date', { ascending: true, nullsFirst: false })
       .then(({ data }) => { if (active) setTasks(data ?? []) })
+    // Your recent nudges to this friend (the database only returns ones you sent).
+    supabase
+      .from('nudges')
+      .select('task_id')
+      .eq('to_id', friend.id)
+      .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+      .then(({ data }) => { if (active) setNudgedIds(new Set((data ?? []).map((n) => n.task_id))) })
     return () => { active = false }
   }, [friend.id])
 
@@ -29,7 +37,8 @@ export default function FriendView({ friend }) {
     <div className="friend-view stack">
       <span className="muted small">{done} of {tasks.length} done</span>
       <div className="progress"><div style={{ width: `${pct}%` }} /></div>
-      <TaskList tasks={tasks} readOnly />
+      <TaskList tasks={tasks} readOnly nudgedIds={nudgedIds}
+        onNudged={(id) => setNudgedIds((s) => new Set(s).add(id))} />
     </div>
   )
 }
