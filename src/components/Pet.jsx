@@ -473,11 +473,15 @@ export default function Pet({ treats, feedSignal }) {
 
   // Petting: tap/click 宝宝. With a task done today it shows hearts; with none it's
   // grumpy (anger mark / dizzy spiral, taking turns). A sleeping cat stays asleep.
+  // Info bubble: shows while a mouse hovers 宝宝. Touch screens can't hover, so a tap shows it briefly.
+  const lastPointer = useRef('mouse')
   function poke() {
     if (treats > 0) setHearts((h) => h + 1)
     else setGrump((g) => ({ kind: g?.kind === 'anger' ? 'dizzy' : 'anger', key: Date.now() }))
-    setBubble(true)
-    later(() => setBubble(false), 3500)
+    if (lastPointer.current !== 'mouse') {
+      setBubble(true)
+      later(() => setBubble(false), 3500)
+    }
   }
 
   const asleep = mood === 'sleepy' && inBed && !walking && !eating
@@ -513,7 +517,12 @@ export default function Pet({ treats, feedSignal }) {
           </span>
         )}
 
-        <button className="pet-btn" onClick={poke} aria-label={`Pet 宝宝 the cat (${mood}, ${treats} treats today)`}>
+        <button className="pet-btn" onClick={poke}
+          onPointerDown={(e) => { lastPointer.current = e.pointerType }}
+          onPointerEnter={(e) => { if (e.pointerType === 'mouse') setBubble(true) }}
+          onPointerLeave={(e) => { if (e.pointerType === 'mouse') setBubble(false) }}
+          onFocus={() => setBubble(true)} onBlur={() => setBubble(false)}
+          aria-label={`Pet 宝宝 the cat (${mood}, ${treats} treats today)`}>
           <PixelCat facing={facing} pose={walking ? 'walk' : asleep ? 'loaf' : 'sit'} eyes={eating || mood === 'happy' ? 'happy' : 'open'} />
         </button>
       </div>
