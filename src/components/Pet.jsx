@@ -160,7 +160,8 @@ const MOOD_LINES = {
   happy: 'So full and happy!',
 }
 
-// ---------- grumpy reactions (petting with no tasks done today) ----------
+// ---------- reactions: one pixel mark that pops up over 宝宝 ----------
+// heart = fed or petted after finishing a task; anger / dizzy = petted with no task done today
 const ANGER = [
   '..RR.....RR..',
   '..RR.....RR..',
@@ -193,14 +194,28 @@ const DIZZY = [
   '....KK..KKK....',
   '.....KKKK......',
 ]
-const GRUMP_COLORS = { R: '#d64545', K: '#3a3a40' }
+const HEART = [
+  '..KK...KK..',
+  '.KPPK.KPPK.',
+  'KPWPPKPPPPK',
+  'KPWPPPPPPPK',
+  'KPPPPPPPPPK',
+  '.KPPPPPPPK.',
+  '..KPPPPPK..',
+  '...KPPPK...',
+  '....KPK....',
+  '.....K.....',
+]
+const REACTION_COLORS = { R: '#d64545', K: '#3a3a40' }
+const HEART_COLORS = { K: '#8b2e3c', P: '#e8707f', W: '#fde3e6' }
+const REACTIONS = { anger: ANGER, dizzy: DIZZY, heart: HEART }
 
-function Grump({ kind }) {
-  const rows = kind === 'anger' ? ANGER : DIZZY
+function Reaction({ kind }) {
+  const rows = REACTIONS[kind]
   return (
     <svg className={`grump ${kind}`} viewBox={`0 0 ${rows[0].length} ${rows.length}`}
       width={rows[0].length * 2} height={rows.length * 2} shapeRendering="crispEdges" aria-hidden="true">
-      {pixels(rows, GRUMP_COLORS)}
+      {pixels(rows, kind === 'heart' ? HEART_COLORS : REACTION_COLORS)}
     </svg>
   )
 }
@@ -321,9 +336,9 @@ export default function Pet({ treats, feedSignal }) {
   const [inBed, setInBed] = useState(true)
   const [food, setFood] = useState(null) // x position of a dropped treat
   const [eating, setEating] = useState(false)
-  const [hearts, setHearts] = useState(0) // bump to replay the hearts
   const [bubble, setBubble] = useState(false)
-  const [grump, setGrump] = useState(null) // { kind: 'anger' | 'dizzy', key }
+  const [reaction, setReaction] = useState(null) // { kind: 'heart' | 'anger' | 'dizzy', key }
+  const react = (kind) => setReaction({ kind, key: Date.now() + Math.random() })
   const [perched, setPerched] = useState(false) // sitting up on the cat tree
 
   const mood = treats >= 3 ? 'happy' : treats >= 1 ? 'content' : 'sleepy'
@@ -459,7 +474,7 @@ export default function Pet({ treats, feedSignal }) {
         later(() => {
           setFood(null)
           setEating(false)
-          setHearts((h) => h + 1)
+          react('heart')
           busyRef.current = false
         }, 1400)
       })
@@ -471,13 +486,13 @@ export default function Pet({ treats, feedSignal }) {
     timers.current.forEach(clearTimeout)
   }, [])
 
-  // Petting: tap/click 宝宝. With a task done today it shows hearts; with none it's
-  // grumpy (anger mark / dizzy spiral, taking turns). A sleeping cat stays asleep.
+  // Petting: tap/click 宝宝. With a task done today: a heart. With none: grumpy
+  // (anger mark or dizzy spiral, picked at random). A sleeping cat stays asleep.
   // Info bubble: shows while a mouse hovers 宝宝. Touch screens can't hover, so a tap shows it briefly.
   const lastPointer = useRef('mouse')
   function poke() {
-    if (treats > 0) setHearts((h) => h + 1)
-    else setGrump((g) => ({ kind: g?.kind === 'anger' ? 'dizzy' : 'anger', key: Date.now() }))
+    if (treats > 0) react('heart')
+    else react(Math.random() < 0.5 ? 'anger' : 'dizzy')
     if (lastPointer.current !== 'mouse') {
       setBubble(true)
       later(() => setBubble(false), 3500)
@@ -510,11 +525,8 @@ export default function Pet({ treats, feedSignal }) {
           </div>
         )}
         {asleep && <span className="zzz" aria-hidden="true">z</span>}
-        {grump && <span key={grump.key} className="grump-wrap"><Grump kind={grump.kind} /></span>}
-        {hearts > 0 && (
-          <span key={hearts} className="hearts" aria-hidden="true">
-            <span>♥</span><span>♥</span><span>♥</span>
-          </span>
+        {reaction && (
+          <span key={reaction.key} className={`grump-wrap ${reaction.kind}`}><Reaction kind={reaction.kind} /></span>
         )}
 
         <button className="pet-btn" onClick={poke}
