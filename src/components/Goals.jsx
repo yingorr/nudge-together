@@ -1,31 +1,35 @@
 import { useState } from 'react'
 import { CATEGORIES, categoryLabel } from '../lib/constants'
 import { formatDue, todayISO } from '../lib/dates'
-import { GAP_OPTIONS, currentStep, stepsOf } from '../lib/goals'
+import { DEFAULT_DAYS, clampDays, currentStep, daysFor, stepsOf } from '../lib/goals'
 import ConfirmButton from './ConfirmButton'
 
-const gapLabel = (n) => (n === 1 ? 'every day' : `every ${n} days`)
 
 // ---------- new goal form ----------
+// Step 1 gets a date; every later step gets "Days": how many days after the
+// previous step is finished it becomes due.
+const blankStep = () => ({ title: '', days: DEFAULT_DAYS })
+
 function GoalForm({ onCreate }) {
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState('personal')
-  const [gap, setGap] = useState(2)
   const [firstDue, setFirstDue] = useState(todayISO())
-  const [steps, setSteps] = useState(['', '', ''])
+  const [steps, setSteps] = useState([blankStep(), blankStep(), blankStep()])
 
-  const filled = steps.map((s) => s.trim()).filter(Boolean)
+  const filled = steps.filter((s) => s.title.trim())
   const ready = title.trim() && firstDue && filled.length > 0
+  const setStep = (i, change) => setSteps(steps.map((x, j) => (j === i ? { ...x, ...change } : x)))
 
   function reset() {
-    setTitle(''); setCategory('personal'); setGap(2); setFirstDue(todayISO()); setSteps(['', '', ''])
+    setTitle(''); setCategory('personal'); setFirstDue(todayISO()); setSteps([blankStep(), blankStep(), blankStep()])
   }
 
   async function submit(e) {
     e.preventDefault()
     if (!ready) return
-    const ok = await onCreate({ title: title.trim(), category, gap_days: gap }, filled, firstDue)
+    const clean = filled.map((s) => ({ title: s.title.trim(), days: clampDays(s.days) }))
+    const ok = await onCreate({ title: title.trim(), category, gap_days: DEFAULT_DAYS }, clean, firstDue)
     if (ok) { reset(); setOpen(false) }
   }
 
@@ -36,42 +40,49 @@ function GoalForm({ onCreate }) {
   return (
     <form className="card stack" onSubmit={submit}>
       <input className="title-input" value={title} onChange={(e) => setTitle(e.target.value)}
-        placeholder="Big goal… e.g. Study for the GMAT" maxLength={200} autoFocus aria-label="Goal name" />
-      <div className="task-fields">
-        <label className="field">
-          <span className="field-label">Category</span>
-          <select value={category} onChange={(e) => setCategory(e.target.value)}>
-            {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-          </select>
-        </label>
-        <label className="field">
-          <span className="field-label">Days between steps</span>
-          <select value={gap} onChange={(e) => setGap(Number(e.target.value))}>
-            {GAP_OPTIONS.map((n) => <option key={n} value={n}>{n} day{n === 1 ? '' : 's'}</option>)}
-          </select>
-        </label>
-        <label className="field">
-          <span className="field-label">First step due <span className="required" aria-hidden="true">*</span></span>
-          <input type="date" className={firstDue ? '' : 'empty'} value={firstDue} required
-            onChange={(e) => setFirstDue(e.target.value)} />
-        </label>
-      </div>
+        placeholder="Goal name" maxLength={200} autoFocus aria-label="Goal name" />
+      <label className="field">
+        <span className="field-label">Category</span>
+        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+        </select>
+      </label>
 
       <div className="field">
         <span className="field-label">Steps, in order</span>
-        <ol className="step-inputs">
+        <div className="step-rows">
+          <div className="step-row head" aria-hidden="true">
+            <span />
+            <span className="field-label">Step</span>
+            <span className="field-label">Due / Days</span>
+            <span />
+          </div>
           {steps.map((s, i) => (
-            <li key={i}>
-              <input value={s} maxLength={200} placeholder={`Step ${i + 1}`} aria-label={`Step ${i + 1}`}
-                onChange={(e) => setSteps(steps.map((x, j) => (j === i ? e.target.value : x)))} />
-              {steps.length > 1 && (
+            <div key={i} className="step-row">
+              <span className="step-num">{i + 1}</span>
+              <input value={s.title} maxLength={200} placeholder={`Step ${i + 1}`} aria-label={`Step ${i + 1}`}
+                onChange={(e) => setStep(i, { title: e.target.value })} />
+              {i === 0 ? (
+                <input type="date" className={`step-date ${firstDue ? '' : 'empty'}`} value={firstDue} required
+                  aria-label="First step due date" onChange={(e) => setFirstDue(e.target.value)} />
+              ) : (
+                <label className="days-input">
+                  <input type="number" inputMode="numeric" min="1" max="60" value={s.days}
+                    aria-label={`Step ${i + 1} days after the previous step`}
+                    onChange={(e) => setStep(i, { days: e.target.value })}
+                    onBlur={(e) => setStep(i, { days: clampDays(e.target.value) })} />
+                  <span>days</span>
+                </label>
+              )}
+              {steps.length > 1 ? (
                 <button type="button" className="icon-btn" aria-label={`Remove step ${i + 1}`}
                   onClick={() => setSteps(steps.filter((_, j) => j !== i))}>✕</button>
-              )}
-            </li>
+              ) : <span />}
+            </div>
           ))}
-        </ol>
-        <button type="button" className="link small add-step" onClick={() => setSteps([...steps, ''])}>+ Add step</button>
+        </div>
+        <span className="muted small">Days = how many days after the previous step is finished.</span>
+        <button type="button" className="link small add-step" onClick={() => setSteps([...steps, blankStep()])}>+ Add step</button>
       </div>
 
       <div className="row">
@@ -84,8 +95,9 @@ function GoalForm({ onCreate }) {
 
 // ---------- one goal ----------
 function GoalCard({ goal, steps, onUpdateTask, onUpdateGoal, onDeleteGoal, onAddStep, onRemoveStep }) {
+  const [newDays, setNewDays] = useState(DEFAULT_DAYS)
   const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState({ title: goal.title, gap_days: goal.gap_days })
+  const [draft, setDraft] = useState({ title: goal.title })
   const [newStep, setNewStep] = useState('')
 
   const done = steps.filter((s) => s.completed).length
@@ -101,22 +113,16 @@ function GoalCard({ goal, steps, onUpdateTask, onUpdateGoal, onDeleteGoal, onAdd
   async function addStep(e) {
     e.preventDefault()
     if (!newStep.trim()) return
-    await onAddStep(goal, newStep.trim())
+    await onAddStep(goal, newStep.trim(), clampDays(newDays))
     setNewStep('')
   }
 
   return (
     <section className={`card stack goal ${finished ? 'finished' : ''}`}>
       {editing ? (
-        <form className="stack" onSubmit={(e) => { e.preventDefault(); if (!draft.title.trim()) return; onUpdateGoal(goal.id, { title: draft.title.trim(), gap_days: draft.gap_days }); setEditing(false) }}>
+        <form className="stack" onSubmit={(e) => { e.preventDefault(); if (!draft.title.trim()) return; onUpdateGoal(goal.id, { title: draft.title.trim() }); setEditing(false) }}>
           <input value={draft.title} maxLength={200} autoFocus aria-label="Goal name"
             onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
-          <label className="field">
-            <span className="field-label">Days between steps</span>
-            <select value={draft.gap_days} onChange={(e) => setDraft({ ...draft, gap_days: Number(e.target.value) })}>
-              {GAP_OPTIONS.map((n) => <option key={n} value={n}>{n} day{n === 1 ? '' : 's'}</option>)}
-            </select>
-          </label>
           <div className="row between">
             <div className="row">
               <button className="btn primary small" disabled={!draft.title.trim()}>Save</button>
@@ -132,11 +138,10 @@ function GoalCard({ goal, steps, onUpdateTask, onUpdateGoal, onDeleteGoal, onAdd
             <strong className="goal-title">{goal.title}</strong>
             <span className="task-meta">
               <span className={`tag ${goal.category}`}>{categoryLabel(goal.category)}</span>
-              <span className="muted">Next step {gapLabel(goal.gap_days)}</span>
             </span>
           </div>
           <button className="icon-btn" aria-label="Edit goal"
-            onClick={() => { setDraft({ title: goal.title, gap_days: goal.gap_days }); setEditing(true) }}>✎</button>
+            onClick={() => { setDraft({ title: goal.title }); setEditing(true) }}>✎</button>
         </div>
       )}
 
@@ -164,6 +169,18 @@ function GoalCard({ goal, steps, onUpdateTask, onUpdateGoal, onDeleteGoal, onAdd
                 </span>
               </div>
               {state === 'waiting' && (
+                <label className="days-input compact">
+                  <input type="number" inputMode="numeric" min="1" max="60" defaultValue={daysFor(s, goal)}
+                    aria-label={`Days after the previous step for "${s.title}"`}
+                    onBlur={(e) => {
+                      const v = clampDays(e.target.value)
+                      e.target.value = v
+                      if (v !== daysFor(s, goal)) onUpdateTask(s.id, { step_days: v })
+                    }} />
+                  <span>days</span>
+                </label>
+              )}
+              {state === 'waiting' && (
                 <ConfirmButton label="✕" question="Remove?" className="icon-btn" onConfirm={() => onRemoveStep(s.id)} />
               )}
             </li>
@@ -174,6 +191,11 @@ function GoalCard({ goal, steps, onUpdateTask, onUpdateGoal, onDeleteGoal, onAdd
       <form className="row add-step-row" onSubmit={addStep}>
         <input value={newStep} maxLength={200} placeholder="Add a step at the end…" aria-label="New step"
           onChange={(e) => setNewStep(e.target.value)} />
+        <label className="days-input">
+          <input type="number" inputMode="numeric" min="1" max="60" value={newDays} aria-label="New step days after the previous step"
+            onChange={(e) => setNewDays(e.target.value)} onBlur={(e) => setNewDays(clampDays(e.target.value))} />
+          <span>days</span>
+        </label>
         <button className="btn small" disabled={!newStep.trim()}>Add</button>
       </form>
     </section>
@@ -186,7 +208,7 @@ export default function Goals({ goals, tasks, onCreateGoal, ...actions }) {
     <main className="stack">
       <p className="muted small goals-intro">
         Break a big goal into small steps. Only the current step shows in My tasks; when you finish it,
-        the next one is scheduled automatically.
+        the next one is due its number of days later.
       </p>
       <GoalForm onCreate={onCreateGoal} />
       {goals.length === 0 && <p className="muted empty">No goals yet.</p>}

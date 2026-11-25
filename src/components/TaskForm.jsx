@@ -39,7 +39,7 @@ export default function TaskForm({ onAdd }) {
         className="title-input"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="Add a small step… e.g. Study GMAT section 1"
+        placeholder="Task name"
         maxLength={200}
         autoFocus
       />

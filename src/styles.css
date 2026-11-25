@@ -243,6 +243,16 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .check-btn.small { width: 30px; height: 30px; font-size: 15px; }
 .step-marker { width: 30px; height: 30px; flex-shrink: 0; display: grid; place-items: center; }
 .step-marker::before { content: ''; width: 10px; height: 10px; border-radius: 50%; border: 2px dashed var(--border); }
+.step-rows { display: flex; flex-direction: column; gap: 8px; }
+.step-row { display: grid; grid-template-columns: 18px minmax(0, 1fr) 132px 36px; align-items: center; gap: 6px; }
+.step-row.head { margin-bottom: -4px; }
+.step-num { font-size: 13px; color: var(--muted); text-align: right; }
+.step-row input { min-width: 0; width: 100%; }
+.step-row .step-date { padding: 0 8px; font-size: 15px; }
+.days-input { display: flex; flex-direction: row; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; }
+.days-input input { width: 64px; min-height: 40px; padding: 6px 8px; text-align: center; font-size: 16px; }
+.days-input.compact input { width: 52px; min-height: 34px; padding: 4px 6px; }
+@media (max-width: 380px) { .step-row { grid-template-columns: 16px minmax(0, 1fr) 118px 32px; } }
 .step-inputs { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
 .step-inputs li { display: flex; align-items: center; gap: 4px; }
 .step-inputs li::marker { color: var(--muted); font-size: 13px; }

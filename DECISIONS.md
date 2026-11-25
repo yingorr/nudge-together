@@ -114,10 +114,12 @@ in your list; the rest wait in the Goals tab. A big goal never floods your to-do
 which is the point of breaking it down. Because of this, waiting steps are the one
 case where a task may have no due date (enforced by a database rule).
 
-**The next step is scheduled when you finish one.** Each goal has a "days between
-steps" gap. Finishing (or removing) the current step gives the next one a due date
-that many days after today, so the plan adapts to your real pace instead of fixed
-dates going overdue. You pick the first step's date. Scheduling is done by the app,
+**The next step is scheduled when you finish one.** You pick the first step's date;
+every later step has its own number of **days** (a quick step can be 1, a big one 5).
+Finishing (or removing) the current step gives the next one a due date that many days
+after today, so the plan adapts to your real pace instead of fixed dates going overdue.
+This replaced an earlier single gap for the whole goal, which didn't fit steps of
+different sizes. Scheduling is done by the app,
 using your local date, so "today" matches your time zone. *Later:* smarter
 auto-scheduling (for example, spreading steps toward a goal deadline).
 

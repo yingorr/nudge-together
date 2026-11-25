@@ -90,11 +90,11 @@ export default function Home({ session }) {
   }
 
   // Goal steps: when a goal has no scheduled unfinished step, give the next one
-  // a due date `gap_days` after today. Called after a step is finished or removed.
+  // a due date its own number of days after today. Called after a step is finished or removed.
   async function scheduleNextStep(goalId, taskList) {
     const goal = goals.find((g) => g.id === goalId)
     if (!goal) return
-    const next = nextToSchedule(stepsOf(taskList, goalId), goal.gap_days)
+    const next = nextToSchedule(stepsOf(taskList, goalId), goal)
     if (!next) return
     setTasks((ts) => ts.map((t) => (t.id === next.step.id ? { ...t, due_date: next.due_date } : t)))
     const { error } = await supabase.from('tasks').update({ due_date: next.due_date }).eq('id', next.step.id)
@@ -126,8 +126,9 @@ export default function Home({ session }) {
   async function createGoal(goal, stepTitles, firstDue) {
     const { data, error } = await supabase.from('goals').insert({ ...goal, user_id: userId }).select().single()
     if (error) { setError(error.message); return false }
-    const steps = stepTitles.map((title, i) => ({
-      user_id: userId, goal_id: data.id, step_order: i, title, category: goal.category,
+    const steps = stepTitles.map((s, i) => ({
+      user_id: userId, goal_id: data.id, step_order: i, title: s.title, category: goal.category,
+      step_days: i === 0 ? null : s.days,
       due_date: i === 0 ? firstDue : null,
     }))
     const { error: stepError } = await supabase.from('tasks').insert(steps)
@@ -156,13 +157,13 @@ export default function Home({ session }) {
   }
 
   // New step goes at the end; if nothing is scheduled (e.g. the goal was finished), it becomes current.
-  async function addStep(goal, title) {
+  async function addStep(goal, title, days) {
     const steps = stepsOf(tasks, goal.id)
     const order = steps.length ? Math.max(...steps.map((s) => s.step_order ?? 0)) + 1 : 0
     const hasCurrent = steps.some((s) => !s.completed && s.due_date)
     const { error } = await supabase.from('tasks').insert({
-      user_id: userId, goal_id: goal.id, step_order: order, title, category: goal.category,
-      due_date: hasCurrent ? null : addDays(todayISO(), goal.gap_days),
+      user_id: userId, goal_id: goal.id, step_order: order, title, category: goal.category, step_days: days,
+      due_date: hasCurrent ? null : addDays(todayISO(), days),
     })
     if (error) setError(error.message)
     loadTasks()

@@ -43,7 +43,7 @@ export default function Auth() {
           <label>
             Display name
             <input value={displayName} onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="What friends will see, e.g. Sam" maxLength={40} required />
+              placeholder="What friends will see" maxLength={40} required />
           </label>
         )}
         <label>
