@@ -3,6 +3,8 @@ import { CATEGORIES, categoryLabel } from '../lib/constants'
 import { formatDue, todayISO } from '../lib/dates'
 import { DEFAULT_DAYS, clampDays, currentStep, daysFor, stepsOf } from '../lib/goals'
 import ConfirmButton from './ConfirmButton'
+import PriorityPicker from './PriorityPicker'
+import TimePicker from './TimePicker'
 
 
 // ---------- new goal form ----------
@@ -14,6 +16,8 @@ function GoalForm({ onCreate }) {
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState('personal')
+  const [priority, setPriority] = useState(null)
+  const [timeNeeded, setTimeNeeded] = useState(null)
   const [firstDue, setFirstDue] = useState(todayISO())
   const [steps, setSteps] = useState([blankStep(), blankStep(), blankStep()])
 
@@ -22,14 +26,14 @@ function GoalForm({ onCreate }) {
   const setStep = (i, change) => setSteps(steps.map((x, j) => (j === i ? { ...x, ...change } : x)))
 
   function reset() {
-    setTitle(''); setCategory('personal'); setFirstDue(todayISO()); setSteps([blankStep(), blankStep(), blankStep()])
+    setTitle(''); setCategory('personal'); setPriority(null); setTimeNeeded(null); setFirstDue(todayISO()); setSteps([blankStep(), blankStep(), blankStep()])
   }
 
   async function submit(e) {
     e.preventDefault()
     if (!ready) return
     const clean = filled.map((s) => ({ title: s.title.trim(), days: clampDays(s.days) }))
-    const ok = await onCreate({ title: title.trim(), category, gap_days: DEFAULT_DAYS }, clean, firstDue)
+    const ok = await onCreate({ title: title.trim(), category, priority, time_needed: timeNeeded, gap_days: DEFAULT_DAYS }, clean, firstDue)
     if (ok) { reset(); setOpen(false) }
   }
 
@@ -41,12 +45,23 @@ function GoalForm({ onCreate }) {
     <form className="card stack" onSubmit={submit}>
       <input className="title-input" value={title} onChange={(e) => setTitle(e.target.value)}
         placeholder="Goal name" maxLength={200} autoFocus aria-label="Goal name" />
-      <label className="field">
-        <span className="field-label">Category</span>
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-        </select>
-      </label>
+      <div className="task-fields">
+        <label className="field">
+          <span className="field-label">Category</span>
+          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+            {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+          </select>
+        </label>
+        <div className="field full" role="group" aria-labelledby="goal-prio">
+          <span className="field-label" id="goal-prio">Priority <span className="muted">(optional)</span></span>
+          <PriorityPicker value={priority} onChange={setPriority} />
+        </div>
+        <div className="field full" role="group" aria-labelledby="goal-time">
+          <span className="field-label" id="goal-time">Time needed <span className="muted">(optional)</span></span>
+          <TimePicker value={timeNeeded} onChange={setTimeNeeded} />
+        </div>
+      </div>
+      <span className="muted small">Category, priority and time needed apply to every step; you can change a step on its own in My tasks.</span>
 
       <div className="field">
         <span className="field-label">Steps, in order</span>

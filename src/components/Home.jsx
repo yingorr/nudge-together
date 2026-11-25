@@ -128,6 +128,7 @@ export default function Home({ session }) {
     if (error) { setError(error.message); return false }
     const steps = stepTitles.map((s, i) => ({
       user_id: userId, goal_id: data.id, step_order: i, title: s.title, category: goal.category,
+      priority: goal.priority, time_needed: goal.time_needed,
       step_days: i === 0 ? null : s.days,
       due_date: i === 0 ? firstDue : null,
     }))
@@ -163,6 +164,7 @@ export default function Home({ session }) {
     const hasCurrent = steps.some((s) => !s.completed && s.due_date)
     const { error } = await supabase.from('tasks').insert({
       user_id: userId, goal_id: goal.id, step_order: order, title, category: goal.category, step_days: days,
+      priority: goal.priority ?? null, time_needed: goal.time_needed ?? null,
       due_date: hasCurrent ? null : addDays(todayISO(), days),
     })
     if (error) setError(error.message)

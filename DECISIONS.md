@@ -124,8 +124,9 @@ using your local date, so "today" matches your time zone. *Later:* smarter
 auto-scheduling (for example, spreading steps toward a goal deadline).
 
 **Goals have their own tab.** It keeps My tasks focused on what's due now; the Goals
-tab shows the whole plan and progress. Steps are just a name and use the goal's
-category, to keep setting up a goal quick.
+tab shows the whole plan and progress. Steps are just a name plus their days;
+category, priority and time needed are set once on the goal and copied onto each step
+(including steps added later), and any single step can be changed in My tasks.
 
 ## Friends and nudges
 

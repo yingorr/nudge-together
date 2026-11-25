@@ -14,8 +14,8 @@ each other accountable with friends.
 - Round checkmark button to mark a task done; deleting shows an **Undo** bar instead of a pop-up
 - Filters: category, Overdue, and Time needed; the **Done** button switches to a list of finished tasks
 - Same-day tasks are sorted by priority (high first); "Due today / tomorrow / in 2 days" in maroon
-- **Goals:** group small steps under a big goal (Goals tab). You pick the first step's date; each later
-  step has a number of **days**. Only the current step shows in My tasks; finishing it makes the next
+- **Goals:** group small steps under a big goal (Goals tab). Set a category and optional priority / time
+  needed for all its steps, pick the first step's date, and give each later step a number of **days**. Only the current step shows in My tasks; finishing it makes the next
   step due that many days later
 - In-app reminder banner with task counts per section ("2 overdue · 1 due today · 3 this week · 1 next week & after")
 - Overdue tag on unfinished past-due tasks, with an Overdue filter that combines with the other filters
@@ -100,7 +100,7 @@ already run, so each runs exactly once.
 | `20261122203500_time_needed.sql` | Optional "time needed" (low / medium / high) |
 | `20261125050000_nudges.sql` | Nudges: friends checking in on each other's tasks |
 | `20261125060000_goals.sql` | Goals and their steps (tasks with a goal and order) |
-| `20261125070000_step_days.sql` | Each goal step has its own number of days |
+| `20261125070000_goal_step_details.sql` | Days per goal step; optional priority / time needed on goals |
 
 **To change the database:** add a new file named `YYYYMMDDHHMMSS_short_description.sql`
 (`npx supabase migration new short_description` creates one), write the SQL, then run
