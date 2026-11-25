@@ -166,7 +166,45 @@ function StepEditor({ step, goal, waiting, onSave, onCancel, onDelete }) {
 }
 
 // ---------- one goal ----------
-function GoalCard({ goal, steps, onUpdateTask, onDeleteTask, onUpdateGoal, onDeleteGoal, onAddStep }) {
+// Small "+" between steps; opens a row to type a new step in that spot.
+function InsertStep({ after, onInsert }) {
+  const [open, setOpen] = useState(false)
+  const [title, setTitle] = useState('')
+  const [days, setDays] = useState(DEFAULT_DAYS)
+
+  async function submit(e) {
+    e.preventDefault()
+    if (!title.trim()) return
+    await onInsert(title.trim(), clampDays(days))
+    setTitle(''); setDays(DEFAULT_DAYS); setOpen(false)
+  }
+
+  if (!open) {
+    return (
+      <li className="insert-step">
+        <button type="button" onClick={() => setOpen(true)} aria-label={`Add a step after "${after.title}"`}
+          title="Add a step here"><span aria-hidden="true">+</span></button>
+      </li>
+    )
+  }
+  return (
+    <li className="insert-step open">
+      <form className="row add-step-row" onSubmit={submit}>
+        <input value={title} maxLength={200} autoFocus placeholder="New step" aria-label="New step"
+          onChange={(e) => setTitle(e.target.value)} />
+        <label className="days-input">
+          <input type="number" inputMode="numeric" min="1" max="60" value={days} aria-label="Days after the previous step"
+            onChange={(e) => setDays(e.target.value)} onBlur={(e) => setDays(clampDays(e.target.value))} />
+          <span>days</span>
+        </label>
+        <button className="btn small" disabled={!title.trim()}>Add</button>
+        <button type="button" className="icon-btn" aria-label="Cancel" onClick={() => { setTitle(''); setOpen(false) }}>✕</button>
+      </form>
+    </li>
+  )
+}
+
+function GoalCard({ goal, steps, onUpdateTask, onDeleteTask, onUpdateGoal, onDeleteGoal, onAddStep, onInsertStep }) {
   const [newDays, setNewDays] = useState(DEFAULT_DAYS)
   const [editing, setEditing] = useState(false)
   const [editingStep, setEditingStep] = useState(null) // step id
@@ -256,21 +294,26 @@ function GoalCard({ goal, steps, onUpdateTask, onDeleteTask, onUpdateGoal, onDel
       </div>
 
       <ol className="goal-steps">
-        {steps.map((s) => {
+        {steps.map((s, i) => {
           const isCurrent = current?.id === s.id
           const state = s.completed ? 'done' : isCurrent || s.due_date ? 'current' : 'waiting'
+          // A "+" goes after the current step and between waiting steps (not after the last one:
+          // the "Add a step at the end" row covers that).
+          const insertAfter = !s.completed && i < steps.length - 1 && (
+            <InsertStep key={`ins-${s.id}`} after={s} onInsert={(title, d) => onInsertStep(goal, s, title, d)} />
+          )
           if (editingStep === s.id) {
-            return (
+            return [(
               <li key={s.id} className="goal-step editing">
                 <StepEditor step={s} goal={goal} waiting={state === 'waiting'}
                   onCancel={() => setEditingStep(null)}
                   onSave={(changes) => { onUpdateTask(s.id, changes); setEditingStep(null) }}
                   onDelete={() => { onDeleteTask(s.id); setEditingStep(null) }} />
               </li>
-            )
+            ), insertAfter]
           }
           const days = daysFor(s, goal)
-          return (
+          return [(
             <li key={s.id} className={`goal-step ${state}`} style={{ '--prio': priorityColor(s.priority) }}>
               {state === 'waiting' ? (
                 <span className="step-marker" aria-hidden="true" />
@@ -291,7 +334,7 @@ function GoalCard({ goal, steps, onUpdateTask, onDeleteTask, onUpdateGoal, onDel
               </div>
               <button className="icon-btn" aria-label={`Edit "${s.title}"`} onClick={() => setEditingStep(s.id)}>✎</button>
             </li>
-          )
+          ), insertAfter]
         })}
       </ol>
 

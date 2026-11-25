@@ -169,6 +169,22 @@ export default function Home({ session }) {
   }
 
   // New step goes at the end; if nothing is scheduled (e.g. the goal was finished), it becomes current.
+  // Insert a new waiting step right after `afterStep`, shifting later steps down one.
+  async function insertStep(goal, afterStep, title, days) {
+    const after = afterStep.step_order ?? 0
+    const later = stepsOf(tasks, goal.id).filter((s) => (s.step_order ?? 0) > after)
+    const shifts = await Promise.all(later.map((s) =>
+      supabase.from('tasks').update({ step_order: (s.step_order ?? 0) + 1 }).eq('id', s.id)))
+    const shiftError = shifts.find((r) => r.error)
+    if (shiftError) { setError(shiftError.error.message); loadTasks(); return }
+    const { error } = await supabase.from('tasks').insert({
+      user_id: userId, goal_id: goal.id, step_order: after + 1, title, category: goal.category, step_days: days,
+      priority: goal.priority ?? null, time_needed: goal.time_needed ?? null, due_date: null,
+    })
+    if (error) setError(error.message)
+    loadTasks()
+  }
+
   async function addStep(goal, title, days) {
     const steps = stepsOf(tasks, goal.id)
     const order = steps.length ? Math.max(...steps.map((s) => s.step_order ?? 0)) + 1 : 0
@@ -248,6 +264,7 @@ export default function Home({ session }) {
           onUpdateGoal={updateGoal}
           onDeleteGoal={deleteGoal}
           onAddStep={addStep}
+          onInsertStep={insertStep}
           onDeleteTask={deleteTask}
         />
       )}

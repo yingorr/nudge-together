@@ -15,7 +15,7 @@ each other accountable with friends.
 - Filters: category, Overdue, and Time needed; the **Done** button switches to a list of finished tasks
 - Same-day tasks are sorted by priority (high first); "Due today / tomorrow / in 2 days" in maroon
 - **Goals:** group small steps under a big goal (Goals tab). Set a category and optional priority / time
-  needed for all its steps, pick the first step's date, and give each later step a number of **days**. Edit a goal's name and tags, or any step (name,
+  needed for all its steps, pick the first step's date, and give each later step a number of **days**. Add steps at the end or in between (the + between steps). Edit a goal's name and tags, or any step (name,
   date or days, priority, time) with its ✎ button. Only the current step shows in My tasks; finishing it makes the next
   step due that many days later
 - In-app reminder banner with task counts per section ("2 overdue · 1 due today · 3 this week · 1 next week & after")
