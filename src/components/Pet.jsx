@@ -361,11 +361,20 @@ export default function Pet({ treats, feedSignal }) {
   const moodRef = useRef(mood)
   const layoutRef = useRef(layout)
   const walkTimer = useRef()
+  const walkCleanup = useRef(null)
   const timers = useRef([])
   moodRef.current = mood
   layoutRef.current = layout
 
   const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.current.push(id) }
+  const petRef = useRef(null)
+  // Where the cat really is on screen right now (mid-walk it's between xRef and the old start).
+  // Starting every walk from here keeps the walk timing and the movement in sync, so 宝宝
+  // never sits down early and slides the rest of the way.
+  const currentX = () => {
+    const v = petRef.current ? parseFloat(getComputedStyle(petRef.current).left) : NaN
+    return Number.isFinite(v) ? v : xRef.current
+  }
   const areaWidth = () => areaRef.current?.clientWidth ?? 390
 
   // Re-measure on resize; if the cat ends up somewhere it shouldn't be, send it to bed.
@@ -401,6 +410,7 @@ export default function Pet({ treats, feedSignal }) {
   }
 
   function walkTo(target, onArrive) {
+    xRef.current = currentX()
     const t = Math.max(0, target)
     const dist = Math.abs(t - xRef.current)
     const speed = moodRef.current === 'happy' ? 80 : moodRef.current === 'content' ? 55 : 30 // px per second
@@ -414,12 +424,26 @@ export default function Pet({ treats, feedSignal }) {
     walkingRef.current = dur > 0
     setX(t)
     xRef.current = t
-    clearTimeout(walkTimer.current)
-    walkTimer.current = setTimeout(() => {
+    // Arrive when the movement really ends (transitionend), with a timer as a backup.
+    walkCleanup.current?.()
+    const el = petRef.current
+    let finished = false
+    const done = () => {
+      if (finished) return
+      finished = true
+      walkCleanup.current?.()
       setWalking(false)
       walkingRef.current = false
       onArrive?.()
-    }, dur * 1000)
+    }
+    const onEnd = (e) => { if (e.target === el && e.propertyName === 'left') done() }
+    if (el && dur > 0) el.addEventListener('transitionend', onEnd)
+    walkTimer.current = setTimeout(done, dur > 0 ? dur * 1000 + 250 : 0)
+    walkCleanup.current = () => {
+      clearTimeout(walkTimer.current)
+      el?.removeEventListener('transitionend', onEnd)
+      walkCleanup.current = null
+    }
   }
 
   function goToBed() {
@@ -475,9 +499,10 @@ export default function Pet({ treats, feedSignal }) {
       Math.abs((z[0] + z[1]) / 2 - xRef.current) < Math.abs((best[0] + best[1]) / 2 - xRef.current) ? z : best)
     const fx = Math.max(zone[0] + 4, Math.min(zone[1] + CAT_W - 30, randomIn([zone[0], zone[1] + CAT_W - 26])))
     setFood(fx)
-    // Stand so the mouth lands on the treat.
-    const standAt = fx > xRef.current ? fx - 39 : fx - 7
     later(() => {
+      // Stand so the mouth lands on the treat (measured from where the cat really is now).
+      const from = currentX()
+      const standAt = fx > from ? fx - 39 : fx - 7
       walkTo(standAt, () => {
         setFacing(fx > xRef.current + CAT_W / 2 ? 1 : -1)
         setEating(true)
@@ -492,6 +517,7 @@ export default function Pet({ treats, feedSignal }) {
   }, [feedSignal]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => () => {
+    walkCleanup.current?.()
     clearTimeout(walkTimer.current)
     timers.current.forEach(clearTimeout)
   }, [])
@@ -525,6 +551,7 @@ export default function Pet({ treats, feedSignal }) {
       )}
 
       <div
+        ref={petRef}
         className={`pet face-${facing > 0 ? 'right' : 'left'} ${walking ? 'walking' : ''} ${eating ? 'eating' : ''} ${inBed && !walking ? 'in-bed' : ''} ${perched && !walking ? 'perched' : ''} ${mood}`}
         style={{ left: x, '--walk': `${duration}s` }}
       >
