@@ -135,8 +135,9 @@ their tasks. That's enforced in the database, not just hidden in the app.
 
 **Nudges replace the checkmark on friends' tasks.** The checkmark did nothing there,
 so that spot became the way to check in: a ? speech bubble ("How's it going??") on
-unfinished tasks and a heart bubble ("Nice work!!") on finished ones. Messages are
-preset, which keeps them short, friendly and safe from misuse. After you nudge, the
+unfinished tasks and a heart bubble ("Nice work!!") on finished ones. There are a few
+preset messages for a quick tap, plus "Write your own…" for a custom note (up to 80
+characters, enforced by the database too). After you nudge, the
 button shows a dot for 24 hours, but you can still send another. A friend's list has a
 "Finished recently" section (last 3 days) so there's something to cheer without
 switching to their Done view.
