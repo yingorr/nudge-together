@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
+import PixelIcon from './PixelIcon'
 
 // "Jordan nudged you: How's it going? 👀 · Study GMAT section 1"
 // Shows unseen nudges; arrives live. Dismissing marks them seen.
@@ -36,7 +37,7 @@ export default function NudgeInbox({ userId }) {
   return (
     <section className="nudge-inbox" role="status" aria-live="polite">
       <div className="row between">
-        <strong>👋 {nudges.length === 1 ? 'A friend checked in' : `${nudges.length} check-ins from friends`}</strong>
+        <strong className="inbox-title"><PixelIcon name="paw" size={18} /> {nudges.length === 1 ? 'A friend checked in' : `${nudges.length} check-ins from friends`}</strong>
         {nudges.length > 1 && (
           <button className="link small" onClick={() => dismiss(nudges.map((n) => n.id))}>Clear all</button>
         )}
