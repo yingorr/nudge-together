@@ -160,6 +160,51 @@ const MOOD_LINES = {
   happy: 'So full and happy!',
 }
 
+// ---------- grumpy reactions (petting with no tasks done today) ----------
+const ANGER = [
+  '..RR.....RR..',
+  '..RR.....RR..',
+  '..RR.....RR..',
+  'RRRR.....RRRR',
+  'RRR.......RRR',
+  '.............',
+  '.............',
+  '.............',
+  'RRR.......RRR',
+  'RRRR.....RRRR',
+  '..RR.....RR..',
+  '..RR.....RR..',
+  '..RR.....RR..',
+]
+const DIZZY = [
+  '...............',
+  '...............',
+  '.....KKKKKK....',
+  '...KKK....KK...',
+  '...K...KK...K..',
+  '..KK.KKKKKK.KK.',
+  '..K..K....K..K.',
+  '..K..K..K.K..K.',
+  '..KK.KKKK.K..K.',
+  '...K......K..K.',
+  '...KKK..KKK.KK.',
+  '.....KKKK..KK..',
+  '..........KK...',
+  '....KK..KKK....',
+  '.....KKKK......',
+]
+const GRUMP_COLORS = { R: '#d64545', K: '#3a3a40' }
+
+function Grump({ kind }) {
+  const rows = kind === 'anger' ? ANGER : DIZZY
+  return (
+    <svg className={`grump ${kind}`} viewBox={`0 0 ${rows[0].length} ${rows.length}`}
+      width={rows[0].length * 2} height={rows.length * 2} shapeRendering="crispEdges" aria-hidden="true">
+      {pixels(rows, GRUMP_COLORS)}
+    </svg>
+  )
+}
+
 // ---------- the bed ----------
 const BED = [
   '....KKKKKKKKKKKKKKKK....',
@@ -278,6 +323,7 @@ export default function Pet({ treats, feedSignal }) {
   const [eating, setEating] = useState(false)
   const [hearts, setHearts] = useState(0) // bump to replay the hearts
   const [bubble, setBubble] = useState(false)
+  const [grump, setGrump] = useState(null) // { kind: 'anger' | 'dizzy', key }
   const [perched, setPerched] = useState(false) // sitting up on the cat tree
 
   const mood = treats >= 3 ? 'happy' : treats >= 1 ? 'content' : 'sleepy'
@@ -425,9 +471,11 @@ export default function Pet({ treats, feedSignal }) {
     timers.current.forEach(clearTimeout)
   }, [])
 
-  // Petting: tap/click 宝宝 for hearts (a sleeping cat stays asleep) plus its info bubble.
+  // Petting: tap/click 宝宝. With a task done today it shows hearts; with none it's
+  // grumpy (anger mark / dizzy spiral, taking turns). A sleeping cat stays asleep.
   function poke() {
-    setHearts((h) => h + 1)
+    if (treats > 0) setHearts((h) => h + 1)
+    else setGrump((g) => ({ kind: g?.kind === 'anger' ? 'dizzy' : 'anger', key: Date.now() }))
     setBubble(true)
     later(() => setBubble(false), 3500)
   }
@@ -458,6 +506,7 @@ export default function Pet({ treats, feedSignal }) {
           </div>
         )}
         {asleep && <span className="zzz" aria-hidden="true">z</span>}
+        {grump && <span key={grump.key} className="grump-wrap"><Grump kind={grump.kind} /></span>}
         {hearts > 0 && (
           <span key={hearts} className="hearts" aria-hidden="true">
             <span>♥</span><span>♥</span><span>♥</span>
