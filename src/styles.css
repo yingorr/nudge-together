@@ -208,6 +208,7 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .section-count { display: inline-block; min-width: 22px; margin-left: 6px; padding: 1px 7px; border-radius: 999px;
   background: var(--accent-soft); color: var(--accent-text); font-size: 12px; text-align: center; }
 .task-section.overdue .section-bar { color: var(--due-soon); }
+.task-section.recent .section-bar { color: var(--muted); }
 .task-section.overdue .section-count { background: var(--tag-overdue-bg); color: var(--tag-overdue); }
 .task-section .task-list { margin-bottom: 6px; }
 .done-header { padding: 2px 2px 0; }

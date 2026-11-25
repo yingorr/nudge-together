@@ -1,33 +1,10 @@
-// Small pixel speech bubbles for checking in on friends:
-// "…" = how's it going? (unfinished task), heart = nice work (finished task).
+// Small pixel icons. Speech bubbles share one style: "!" = reminders,
+// "?" = nudge a friend, heart = cheer a friend's finished task.
 const ICONS = {
-  checkin: [
-    '............',
-    '..KKKKKKKK..',
-    '.KWWWWWWWWK.',
-    'KWWWWWWWWWWK',
-    'KWWWWWWWWWWK',
-    'KWGGWGGWGGWK',
-    'KWGGWGGWGGWK',
-    'KWWWWWWWWWWK',
-    '.KWWWWWWWWK.',
-    '..KKWKKKKK..',
-    '..KWK.......',
-    '..KK........',
-  ],
+  // speech bubble with a small pink heart: cheer a friend's finished task
   cheer: [
-    '............',
-    '..KKKKKKKK..',
-    '.KWWWWWWWWK.',
-    'KWWRRWWRRWWK',
-    'KWRRRRRRRRWK',
-    'KWRRRRRRRRWK',
-    'KWWRRRRRRWWK',
-    'KWWWRRRRWWWK',
-    '.KWWWRRWWWK.',
-    '..KKWKKKKK..',
-    '..KWK.......',
-    '..KK........',
+    '...TTTTTT...', '.TTWWWWWWTT.', 'TWWWWWWWWWWT', 'TWWRRWWRRWWT', 'TWWRRRRRRWWT', 'TWWWRRRRWWWT',
+    'TWWWWRRWWWWT', 'TWWWWWWWWWWT', '.TTWWWWWWTT.', '..TWTTTTTT..', '..TT........', '..T.........',
   ],
   // speech bubble with a red "?": nudge a friend about an unfinished task
   ask: [
@@ -43,7 +20,7 @@ const ICONS = {
   ],
 }
 // Outline and dots follow the theme's sage (lighter in dark mode); T = current text color.
-const COLORS = { K: 'var(--accent)', G: 'var(--accent)', W: '#fffdf7', R: '#e07a8a', T: 'currentColor', X: '#d64545' }
+const COLORS = { K: 'var(--accent)', G: 'var(--accent)', W: '#efe4cc', R: '#e07a8a', T: 'currentColor', X: '#d64545' }
 
 export default function PixelIcon({ name, size = 24 }) {
   const rows = ICONS[name]

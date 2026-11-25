@@ -58,6 +58,14 @@ export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false, 
 
   const groups = Object.fromEntries(SECTIONS.map((s) => [s.id, []]))
   if (!showingDone) visible.forEach((t) => groups[dateGroup(t)].push(t))
+  // Friends' lists: tasks they finished in the last 3 days, so you can cheer them
+  // without switching to Done. Newest first.
+  const recentCutoff = Date.now() - 3 * 24 * 60 * 60 * 1000
+  const recent = readOnly && !showingDone
+    ? tasks
+        .filter((t) => t.completed && inCategory(t) && t.completed_at && new Date(t.completed_at).getTime() > recentCutoff)
+        .sort((a, b) => b.completed_at.localeCompare(a.completed_at))
+    : []
   // Finished tasks: most recently completed first.
   const doneList = showingDone
     ? [...visible].sort((a, b) => (b.completed_at ?? '').localeCompare(a.completed_at ?? ''))
@@ -101,7 +109,7 @@ export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false, 
         </div>
       )}
 
-      {visible.length === 0 ? (
+      {visible.length === 0 && recent.length === 0 ? (
         <p className="muted empty">
           {tasks.length === 0 ? 'No tasks yet.' : showingDone ? 'Nothing finished here yet.' : 'All caught up!'}
         </p>
@@ -122,6 +130,14 @@ export default function TaskList({ tasks, onUpdate, onDelete, readOnly = false, 
               ))}
             </Section>
           ))}
+          {recent.length > 0 && (
+            <Section id="recent" label="Finished recently" tasks={recent} storeKey="friend">
+              {recent.map((t) => (
+                <TaskItem key={t.id} task={t} readOnly
+                  nudged={nudgedIds?.has(t.id)} onNudged={onNudged} goal={goalsById?.[t.goal_id]} />
+              ))}
+            </Section>
+          )}
         </div>
       )}
     </section>
