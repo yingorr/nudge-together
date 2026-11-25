@@ -165,3 +165,9 @@ the page leaves room for it. It respects the "reduce motion" setting.
 ## Time needed = 1-3 dots (2026-11-25)
 - The left marker on tasks and goal steps is now 1-3 pixel dots: the count is time needed (low/medium/high), the color is priority (gray when no priority). Priority but no time = one thin dash (~2.5 dots tall). Neither = nothing. Always vertically centered on the row.
 - The pie icons are gone. The time picker is three dots picked like a rating (tap the 3rd and the first two fill too; tap the current one again to clear).
+
+## Guests and usernames (2026-11-25)
+- Guests = Supabase anonymous sign-ins ("Allow anonymous sign-ins" is on in the dashboard). Named "Guest", seeded with 2 sample tasks and a 2-step goal. Friends tab is locked; RLS (`is_guest()`) blocks friend requests, accepting, nudging, and being found.
+- Guests upgrade in place: name + username + email → confirm email → set password. Their data stays.
+- Usernames are back (3-20, a-z 0-9 _ .; no dot at start/end, no ".."; unique). Used to add friends (`find_profile`, username or email) and to log in.
+- Username login goes through the `login-username` Edge Function so emails never reach the browser. Accounts without a username pick one on next login.
