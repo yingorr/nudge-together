@@ -103,6 +103,28 @@ field (Category, Due date, Priority, Time needed) has a visible label.
 **Built for phones first.** Touch targets are at least 44px, dropdowns use 16px text
 so iPhones don't zoom in, and layouts wrap on narrow screens.
 
+## Goals
+
+**A goal is a list of ordinary tasks.** Steps are tasks with a goal and an order, so
+they work everywhere tasks do: date sections, reminders, filters, feeding 宝宝, and
+friends can see and nudge the current step. A goal just groups them.
+
+**One step at a time in My tasks.** Only the current step has a due date and appears
+in your list; the rest wait in the Goals tab. A big goal never floods your to-do list,
+which is the point of breaking it down. Because of this, waiting steps are the one
+case where a task may have no due date (enforced by a database rule).
+
+**The next step is scheduled when you finish one.** Each goal has a "days between
+steps" gap. Finishing (or removing) the current step gives the next one a due date
+that many days after today, so the plan adapts to your real pace instead of fixed
+dates going overdue. You pick the first step's date. Scheduling is done by the app,
+using your local date, so "today" matches your time zone. *Later:* smarter
+auto-scheduling (for example, spreading steps toward a goal deadline).
+
+**Goals have their own tab.** It keeps My tasks focused on what's due now; the Goals
+tab shows the whole plan and progress. Steps are just a name and use the goal's
+category, to keep setting up a goal quick.
+
 ## Friends and nudges
 
 **Friends' tasks are read-only.** You can see a friend's progress but never change

@@ -5,7 +5,7 @@ import { daysUntil, formatDue, isOverdue } from '../lib/dates'
 import TaskFields from './TaskFields'
 import NudgeButton from './NudgeButton'
 
-export default function TaskItem({ task, onUpdate, onDelete, readOnly, nudged, onNudged }) {
+export default function TaskItem({ task, onUpdate, onDelete, readOnly, nudged, onNudged, goal }) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(task)
 
@@ -72,6 +72,7 @@ export default function TaskItem({ task, onUpdate, onDelete, readOnly, nudged, o
         <span className="task-meta">
           <span className={`tag ${task.category}`}>{categoryLabel(task.category)}</span>
           {overdue && <span className="tag overdue">Overdue</span>}
+          {goal && <span className="goal-tag" title={`Step of the goal "${goal.title}"`}>◎ {goal.title}</span>}
           {task.time_needed && (
             <span className="time-tag" title={`${timeLabel(task.time_needed)} time needed`}
               role="img" aria-label={`${timeLabel(task.time_needed)} time needed`}>

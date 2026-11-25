@@ -225,6 +225,33 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 
 .pet-toggle.off { opacity: 0.4; }
 
+/* goals */
+.goals-intro { margin: 0 2px; }
+.goal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.goal-title-block { gap: 6px; min-width: 0; }
+.goal-title { font-size: 17px; overflow-wrap: anywhere; }
+.goal.finished .goal-title { color: var(--muted); }
+.goal-progress { display: flex; flex-direction: column; gap: 6px; }
+.goal-progress .progress div { background: var(--accent); }
+.goal-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.goal-step { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid var(--border); }
+.goal-step .step-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.goal-step .step-title { overflow-wrap: anywhere; }
+.goal-step.done .step-title { text-decoration: line-through; color: var(--muted); }
+.goal-step.waiting .step-title { color: var(--muted); }
+.goal-step.current .step-title { font-weight: 600; }
+.check-btn.small { width: 30px; height: 30px; font-size: 15px; }
+.step-marker { width: 30px; height: 30px; flex-shrink: 0; display: grid; place-items: center; }
+.step-marker::before { content: ''; width: 10px; height: 10px; border-radius: 50%; border: 2px dashed var(--border); }
+.step-inputs { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
+.step-inputs li { display: flex; align-items: center; gap: 4px; }
+.step-inputs li::marker { color: var(--muted); font-size: 13px; }
+.step-inputs input { flex: 1; min-width: 0; }
+.add-step { align-self: flex-start; }
+.add-step-row input { min-height: 40px; }
+.goal-tag { font-size: 12px; color: var(--accent-text); background: var(--accent-soft); padding: 2px 8px;
+  border-radius: 999px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 /* nudges */
 .nudge { position: relative; }
 .pixel-icon { image-rendering: pixelated; display: block; }

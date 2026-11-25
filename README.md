@@ -14,6 +14,8 @@ each other accountable with friends.
 - Round checkmark button to mark a task done; deleting shows an **Undo** bar instead of a pop-up
 - Filters: category, Overdue, and Time needed; the **Done** button switches to a list of finished tasks
 - Same-day tasks are sorted by priority (high first); "Due today / tomorrow / in 2 days" in maroon
+- **Goals:** group small steps under a big goal (Goals tab). Only the current step shows in My tasks;
+  finishing it schedules the next step a set number of days later ("Days between steps")
 - In-app reminder banner with task counts per section ("2 overdue · 1 due today · 3 this week · 1 next week & after")
 - Overdue tag on unfinished past-due tasks, with an Overdue filter that combines with the other filters
 - Collapsible date sections: Overdue, Today, This week (next 7 days), Next week & after
@@ -65,11 +67,12 @@ On iPhone/iPad: open the site in Safari → Share → **Add to Home Screen** for
 
 | Piece | File | What it does |
 |---|---|---|
-| Database + security | `supabase/migrations/` | Tables for profiles, tasks, friendships and nudges. Row Level Security means you can only change your own tasks, and only accepted friends can read them or nudge you. |
+| Database + security | `supabase/migrations/` | Tables for profiles, tasks, goals, friendships and nudges. Row Level Security means you can only change your own tasks, and only accepted friends can read them or nudge you. |
 | Login | `src/components/Auth.jsx` | Email/password sign up & log in via Supabase Auth |
 | Home screen | `src/components/Home.jsx` | Loads your tasks, live sync, delete + undo |
 | Tasks | `TaskForm.jsx`, `TaskFields.jsx`, `TaskList.jsx`, `TaskItem.jsx`, `PriorityPicker.jsx`, `TimePicker.jsx` | Add / filter / sections / check off / edit / delete |
 | Dates | `src/lib/dates.js` | Overdue check, date sections, "Due today/tomorrow/in 2 days" wording |
+| Goals | `Goals.jsx`, `src/lib/goals.js` | Goals tab, steps, and scheduling the next step |
 | Reminders | `Reminders.jsx` | Banner with task counts per date section |
 | Friends | `Friends.jsx`, `FriendsPanel.jsx`, `FriendView.jsx`, `ConfirmButton.jsx` | Requests, collapsible friends' tasks, in-app Yes/No confirm |
 | Nudges | `NudgeButton.jsx`, `NudgeInbox.jsx`, `PixelIcon.jsx` | Check in on a friend's task; see check-ins from friends |
@@ -95,6 +98,7 @@ already run, so each runs exactly once.
 | `20261122201500_require_due_date.sql` | Every task must have a due date |
 | `20261122203500_time_needed.sql` | Optional "time needed" (low / medium / high) |
 | `20261125050000_nudges.sql` | Nudges: friends checking in on each other's tasks |
+| `20261125060000_goals.sql` | Goals and their steps (tasks with a goal and order) |
 
 **To change the database:** add a new file named `YYYYMMDDHHMMSS_short_description.sql`
 (`npx supabase migration new short_description` creates one), write the SQL, then run
