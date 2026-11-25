@@ -223,9 +223,9 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .progress { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; }
 .progress div { height: 100%; background: var(--highlight); transition: width 0.3s; }
 
+/* softer than the main text when on; faded when off */
 .pet-toggle { color: var(--muted); display: grid; place-items: center; }
-.pet-toggle:not(.off) { color: var(--text); }
-.pet-toggle.off { opacity: 0.4; }
+.pet-toggle.off { opacity: 0.35; }
 .reminder-icon { color: var(--text); display: inline-flex; }
 
 /* goals */

@@ -231,7 +231,7 @@ export default function Home({ session }) {
           <span className="muted small">{profile?.display_name}</span>
           <button className={`icon-btn pet-toggle ${showPet ? '' : 'off'}`} onClick={() => setShowPet(!showPet)}
             aria-pressed={showPet} aria-label={showPet ? 'Hide the cat' : 'Show the cat'} title={showPet ? 'Hide the cat' : 'Show the cat'}>
-            <PixelIcon name="paw" size={18} />
+            <PixelIcon name="paw" size={14} />
           </button>
           <button className="btn ghost small" onClick={() => supabase.auth.signOut()}>Log out</button>
         </div>
