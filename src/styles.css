@@ -91,8 +91,9 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .logo { font-size: 22px; margin: 0; color: var(--highlight); letter-spacing: -0.5px;
   font-family: 'Space Grotesk', Inter, system-ui, sans-serif; line-height: 0; }
 .logo-mark { display: inline-flex; align-items: center; gap: 8px; }
-/* Phones: hide the display name so the one-line logo keeps its full size */
-@media (max-width: 430px) { .topbar-right .display-name { display: none; } }
+/* Long display names get cut off with "…" so the one-line logo keeps its size */
+.display-name { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 430px) { .display-name { max-width: 60px; } }
 .logo-mark svg { display: block; image-rendering: pixelated; flex-shrink: 0; }
 .topbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
 .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
@@ -438,3 +439,7 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 
 /* Pixel check inside filter chips */
 .chip .pixel-icon { display: inline-block; margin-right: 5px; vertical-align: -1px; }
+
+/* Log out: pixel bubble with an x */
+.logout-btn { display: grid; place-items: center; }
+.logout-btn:hover { color: var(--danger); }

@@ -234,7 +234,9 @@ export default function Home({ session }) {
             aria-pressed={showPet} aria-label={showPet ? 'Hide the cat' : 'Show the cat'} title={showPet ? 'Hide the cat' : 'Show the cat'}>
             <PixelIcon name="paw" size={14} />
           </button>
-          <button className="btn ghost small" onClick={() => supabase.auth.signOut()}>Log out</button>
+          <button className="icon-btn logout-btn" onClick={() => supabase.auth.signOut()} aria-label="Log out" title="Log out">
+            <PixelIcon name="logout" size={18} />
+          </button>
         </div>
       </header>
 

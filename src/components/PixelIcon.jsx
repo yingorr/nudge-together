@@ -11,6 +11,8 @@ const ICONS = {
     '...TTTTTT...', '.TTWWWWWWTT.', 'TWWWXXXXWWWT', 'TWWXXWWXXWWT', 'TWWWWWXXWWWT', 'TWWWWXXWWWWT',
     'TWWWWWWWWWWT', 'TWWWWXXWWWWT', '.TTWWWWWWTT.', '..TWTTTTTT..', '..TT........', '..T.........',
   ],
+  // round bubble with an x: log out
+  logout: ['..TTTTTT..', '.TWWWWWWT.', 'TWWWWWWWWT', 'TWWTWWTWWT', 'TWWWTTWWWT', 'TWWWTTWWWT', 'TWWTWWTWWT', 'TWWWWWWWWT', '.TWWWWWWT.', '..TTTTTT..'],
   // single paw print: show / hide 宝宝 (drawn in the button's text color)
   check: ['......T', '.....TT', 'T...TT.', 'TT.TT..', '.TTT...', '..T....'],
   paw: ['..TT.TT..', '..TT.TT..', 'TT.....TT', 'TT.TTT.TT', '..TTTTT..', '.TTTTTTT.', '.TTTTTTT.', '.TTT.TTT.'],
