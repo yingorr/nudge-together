@@ -266,7 +266,7 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .goal-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: end; }
 .goal-fields > .field.centered { align-items: center; text-align: center; }
 .goal-form-note { margin-top: -4px; }
-.goal-fields .priority-picker.compact { height: 44px; align-items: center; }
+.goal-fields .priority-picker.compact, .goal-fields .time-dots-picker.compact { height: 44px; align-items: center; }
 .goal-fields > .field:first-child select { padding-left: 10px; padding-right: 6px; }
 .priority-picker.compact { flex-wrap: nowrap; gap: 3px; }
 .priority-picker.compact .prio-btn, .priority-picker.compact .time-btn {
@@ -472,3 +472,7 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 /* small inline dots for a goal's time needed */
 .inline-dot { display: inline-block; width: 4px; height: 4px; background: var(--muted); }
 .time-tag:has(.inline-dot) { gap: 2px; }
+/* Priority picker: same dots, hollow in each priority's color, filled when picked */
+.prio-dots .time-dot span { box-shadow: inset 0 0 0 2px var(--prio); }
+.prio-dots .time-dot:hover span { box-shadow: inset 0 0 0 2px var(--prio); opacity: 0.75; }
+.prio-dots .time-dot.on span { background: var(--prio); box-shadow: none; }

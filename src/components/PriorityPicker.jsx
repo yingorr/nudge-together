@@ -1,10 +1,12 @@
 import { PRIORITIES } from '../lib/constants'
 
-// Optional priority: tap a color to set it, tap it again to clear it.
-// compact: colored dots only (the name is in the tooltip / screen-reader label).
+// Optional priority, styled like the time-needed dots: three pixel dots in the priority
+// colors, hollow until picked. Tap one to set it (filled), tap it again to clear it.
+// The chosen priority's name shows next to the dots (hidden in compact mode).
 export default function PriorityPicker({ value, onChange, compact = false }) {
+  const current = PRIORITIES.find((p) => p.value === value)
   return (
-    <div className={`priority-picker ${compact ? 'compact' : ''}`} role="group" aria-label="Priority (optional)">
+    <div className={`time-dots-picker prio-dots ${compact ? 'compact' : ''}`} role="group" aria-label="Priority (optional)">
       {PRIORITIES.map((p) => (
         <button
           key={p.value}
@@ -12,13 +14,14 @@ export default function PriorityPicker({ value, onChange, compact = false }) {
           title={`${p.label} priority`}
           aria-label={`${p.label} priority`}
           aria-pressed={value === p.value}
-          className={`prio-btn ${value === p.value ? 'selected' : ''}`}
+          className={`time-dot ${value === p.value ? 'on' : ''}`}
           style={{ '--prio': p.color }}
           onClick={() => onChange(value === p.value ? null : p.value)}
         >
-          {!compact && p.label}
+          <span />
         </button>
       ))}
+      {!compact && <span className="time-dots-label">{current ? current.label : 'Not set'}</span>}
     </div>
   )
 }
