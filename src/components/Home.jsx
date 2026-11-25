@@ -9,6 +9,7 @@ import Friends from './Friends'
 import FriendsPanel from './FriendsPanel'
 import Pet from './Pet'
 import PixelIcon from './PixelIcon'
+import ConfirmButton from './ConfirmButton'
 import UndoToast from './UndoToast'
 import Goals from './Goals'
 import { addDays, isWaitingStep, nextToSchedule, stepsOf } from '../lib/goals'
@@ -234,9 +235,8 @@ export default function Home({ session }) {
             aria-pressed={showPet} aria-label={showPet ? 'Hide the cat' : 'Show the cat'} title={showPet ? 'Hide the cat' : 'Show the cat'}>
             <PixelIcon name="paw" size={14} />
           </button>
-          <button className="icon-btn logout-btn" onClick={() => supabase.auth.signOut()} aria-label="Log out" title="Log out">
-            <PixelIcon name="logout" size={18} />
-          </button>
+          <ConfirmButton popover className="icon-btn logout-btn" ariaLabel="Log out" question="Log out?"
+            label={<PixelIcon name="logout" size={18} />} onConfirm={() => supabase.auth.signOut()} />
         </div>
       </header>
 
