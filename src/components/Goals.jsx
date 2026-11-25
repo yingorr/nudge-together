@@ -183,7 +183,12 @@ function InsertStep({ after, onInsert }) {
     return (
       <li className="insert-step">
         <button type="button" onClick={() => setOpen(true)} aria-label={`Add a step after "${after.title}"`}
-          title="Add a step here"><span aria-hidden="true">+</span></button>
+          title="Add a step here">
+          <span aria-hidden="true">
+            {/* drawn, not typed, so it sits exactly in the middle of the circle */}
+            <svg viewBox="0 0 10 10" width="10" height="10"><path d="M5 1v8M1 5h8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+          </span>
+        </button>
       </li>
     )
   }
