@@ -332,9 +332,7 @@ export default function Pet({ treats, feedSignal }) {
   function walkTo(target, onArrive) {
     const t = Math.max(0, target)
     const dist = Math.abs(t - xRef.current)
-    let speed = moodRef.current === 'happy' ? 80 : moodRef.current === 'content' ? 55 : 30 // px per second
-    // Crossing behind the task list (wide screens): trot, so it isn't hidden for long.
-    if (layoutRef.current.wide && zoneIndexOf(t) !== zoneIndexOf(xRef.current)) speed = Math.max(speed, 220)
+    const speed = moodRef.current === 'happy' ? 80 : moodRef.current === 'content' ? 55 : 30 // px per second
     const dur = reduceMotion() ? 0 : dist / speed
     if (dist > 1) setFacing(t > xRef.current ? 1 : -1)
     inBedRef.current = false
@@ -427,7 +425,9 @@ export default function Pet({ treats, feedSignal }) {
     timers.current.forEach(clearTimeout)
   }, [])
 
+  // Petting: tap/click 宝宝 for hearts (a sleeping cat stays asleep) plus its info bubble.
   function poke() {
+    setHearts((h) => h + 1)
     setBubble(true)
     later(() => setBubble(false), 3500)
   }
@@ -464,7 +464,7 @@ export default function Pet({ treats, feedSignal }) {
           </span>
         )}
 
-        <button className="pet-btn" onClick={poke} aria-label={`宝宝 the cat, ${mood}. ${treats} treats today.`}>
+        <button className="pet-btn" onClick={poke} aria-label={`Pet 宝宝 the cat (${mood}, ${treats} treats today)`}>
           <PixelCat facing={facing} pose={walking ? 'walk' : asleep ? 'loaf' : 'sit'} eyes={eating || mood === 'happy' ? 'happy' : 'open'} />
         </button>
       </div>
