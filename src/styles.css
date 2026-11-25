@@ -476,3 +476,12 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .prio-dots .time-dot span { box-shadow: inset 0 0 0 2px var(--prio); }
 .prio-dots .time-dot:hover span { box-shadow: inset 0 0 0 2px var(--prio); opacity: 0.75; }
 .prio-dots .time-dot.on span { background: var(--prio); box-shadow: none; }
+
+/* Login screen: "or" divider + guest button */
+.guest-divider { display: flex; align-items: center; gap: 10px; }
+.guest-divider::before, .guest-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.guest-note { margin: -6px 0 0; text-align: center; }
+
+/* Guest mode */
+.guest-banner { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); font-size: 14px; }
+.guest-banner .guest-upgrade label { color: var(--accent-text); }

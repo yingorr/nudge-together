@@ -20,11 +20,11 @@ export default function Friends({ userId, loadFriends, onViewFriend }) {
     const clean = email.trim().toLowerCase()
     if (!clean) return
 
-    // Private lookup: returns one match for this exact email, or nothing.
-    const { data, error: findError } = await supabase.rpc('find_profile_by_email', { p_email: clean })
+    // Private lookup by exact username or exact email: one match or nothing (emails are never returned).
+    const { data, error: findError } = await supabase.rpc('find_profile', { p_identifier: clean.replace(/^@/, '') })
     if (findError) return setMessage({ type: 'error', text: findError.message })
     const target = data?.[0]
-    if (!target) return setMessage({ type: 'error', text: `No Nudge Together account uses ${clean}.` })
+    if (!target) return setMessage({ type: 'error', text: `No Nudge Together account matches ${clean}.` })
     if (target.id === userId) return setMessage({ type: 'error', text: "That's you!" })
 
     const { error } = await supabase
@@ -61,8 +61,8 @@ export default function Friends({ userId, loadFriends, onViewFriend }) {
       <form className="card stack" onSubmit={sendRequest}>
         <strong>Add a friend</strong>
         <div className="row">
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-            placeholder="their email address" autoCapitalize="none" />
+          <input value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Their username or email"
+            placeholder="username or email" autoCapitalize="none" autoCorrect="off" spellCheck={false} />
           <button className="btn primary">Send</button>
         </div>
         {message && <p className={`notice ${message.type}`}>{message.text}</p>}
@@ -85,7 +85,7 @@ export default function Friends({ userId, loadFriends, onViewFriend }) {
 
       <section className="card stack">
         <strong>Friends ({accepted.length})</strong>
-        {accepted.length === 0 && <p className="muted small">No friends yet. Add them using the email they signed up with.</p>}
+        {accepted.length === 0 && <p className="muted small">No friends yet. Add them by their username or the email they signed up with.</p>}
         {accepted.map((f) => (
           <div key={f.id} className="row between">
             <span>{other(f).display_name}</span>

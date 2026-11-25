@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import Logo from './Logo'
+import UsernameSetup from './UsernameSetup'
+import { GuestUpgrade, SetPassword } from './GuestUpgrade'
+import { seedGuest } from '../lib/guest'
 import TaskForm from './TaskForm'
 import TaskList from './TaskList'
 import Reminders from './Reminders'
@@ -17,6 +20,10 @@ import { todayISO } from '../lib/dates'
 
 export default function Home({ session }) {
   const userId = session.user.id
+  const user = session.user
+  const isGuest = Boolean(user.is_anonymous)
+  // A guest who confirmed their new email still needs a password.
+  const needsPassword = !isGuest && Boolean(user.user_metadata?.needs_password)
   const [profile, setProfile] = useState(null)
   const [tasks, setTasks] = useState([])
   const [error, setError] = useState(null)
@@ -65,6 +72,14 @@ export default function Home({ session }) {
     )
     return data
   }, [userId])
+
+  // New guests get a few sample tasks and a goal (once).
+  useEffect(() => {
+    if (!isGuest || user.user_metadata?.seeded) return
+    seedGuest(userId)
+      .then(() => supabase.auth.updateUser({ data: { seeded: true } }))
+      .then(() => { loadTasks(); loadGoals() })
+  }, [isGuest]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     supabase.from('profiles').select('*').eq('id', userId).single()
@@ -224,6 +239,19 @@ export default function Home({ session }) {
     (t) => t.completed && t.completed_at && new Date(t.completed_at).getTime() > dayAgo
   ).length
 
+  // Accounts made before usernames existed pick one first (guests don't need one yet).
+  if (profile && !profile.username && !isGuest) {
+    return <UsernameSetup userId={userId} onDone={(u) => setProfile({ ...profile, username: u })} />
+  }
+
+  const guestBox = isGuest && (
+    <section className="card stack guest-banner">
+      <span><b>You're trying Nudge Together as a guest.</b> Create an account to keep your tasks and add friends.</span>
+      <GuestUpgrade userId={userId} pendingEmail={user.new_email}
+        onUpdated={() => supabase.from('profiles').select('*').eq('id', userId).single().then(({ data }) => setProfile(data))} />
+    </section>
+  )
+
   return (
     <>
     <div className={`app ${showPet ? 'with-pet' : ''}`}>
@@ -235,7 +263,7 @@ export default function Home({ session }) {
             aria-pressed={showPet} aria-label={showPet ? 'Hide the cat' : 'Show the cat'} title={showPet ? 'Hide the cat' : 'Show the cat'}>
             <PixelIcon name="paw" size={14} />
           </button>
-          <ConfirmButton popover className="icon-btn logout-btn" ariaLabel="Log out" question="Log out?"
+          <ConfirmButton popover className="icon-btn logout-btn" ariaLabel="Log out" question={isGuest ? 'Log out? Guest tasks will be lost.' : 'Log out?'}
             label={<PixelIcon name="logout" size={18} />} onConfirm={() => supabase.auth.signOut()} />
         </div>
       </header>
@@ -252,12 +280,14 @@ export default function Home({ session }) {
 
       {tab === 'tasks' && (
         <main className="stack">
+          {guestBox}
+          {needsPassword && <section className="card"><SetPassword /></section>}
           <NudgeInbox userId={userId} />
           <Reminders tasks={listTasks} />
           <TaskForm onAdd={addTask} />
           <TaskList tasks={listTasks} goalsById={goalsById} onUpdate={updateTask} onDelete={deleteTask} />
 
-          <FriendsPanel friends={friends} focusFriend={focusFriend} />
+          {!isGuest && <FriendsPanel friends={friends} focusFriend={focusFriend} />}
         </main>
       )}
 
@@ -275,7 +305,21 @@ export default function Home({ session }) {
         />
       )}
 
-      {tab === 'friends' && (
+      {tab === 'friends' && isGuest && (
+        <main className="stack">
+          <section className="card stack friends-locked">
+            <strong>Friends are for accounts</strong>
+            <p className="muted small" style={{ margin: 0 }}>
+              Create an account to add friends, see each other's tasks and send nudges.
+              Everything you made as a guest comes with you.
+            </p>
+            <GuestUpgrade userId={userId} pendingEmail={user.new_email}
+              onUpdated={() => supabase.from('profiles').select('*').eq('id', userId).single().then(({ data }) => setProfile(data))} />
+          </section>
+        </main>
+      )}
+
+      {tab === 'friends' && !isGuest && (
         <Friends
           userId={userId}
           loadFriends={loadFriends}
