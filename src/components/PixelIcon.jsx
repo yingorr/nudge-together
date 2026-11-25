@@ -36,14 +36,14 @@ const ICONS = {
   ],
   // single paw print: show / hide 宝宝 (drawn in the button's text color)
   paw: ['..TT.TT..', '..TT.TT..', 'TT.....TT', 'TT.TTT.TT', '..TTTTT..', '.TTTTTTT.', '.TTTTTTT.', '.TTT.TTT.'],
-  // exclamation mark: reminder banner
+  // speech bubble with a red "!": reminder banner
   bang: [
-    '...TTT...', '..TTTTT..', '..TTTTT..', '...TTT...', '...TTT...', '...TTT...',
-    '...TTT...', '.........', '...TTT...', '...TTT...', '...TTT...',
+    '...TTTTTT...', '.TTWWWWWWTT.', 'TWWWWXXWWWWT', 'TWWWWXXWWWWT', 'TWWWWXXWWWWT', 'TWWWWXXWWWWT',
+    'TWWWWWWWWWWT', 'TWWWWXXWWWWT', '.TTWWWWWWTT.', '..TWTTTTTT..', '..TT........', '..T.........',
   ],
 }
 // Outline and dots follow the theme's sage (lighter in dark mode); T = current text color.
-const COLORS = { K: 'var(--accent)', G: 'var(--accent)', W: '#fffdf7', R: '#e07a8a', T: 'currentColor' }
+const COLORS = { K: 'var(--accent)', G: 'var(--accent)', W: '#fffdf7', R: '#e07a8a', T: 'currentColor', X: '#d64545' }
 
 export default function PixelIcon({ name, size = 24 }) {
   const rows = ICONS[name]

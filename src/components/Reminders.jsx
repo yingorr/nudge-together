@@ -27,7 +27,7 @@ export default function Reminders({ tasks }) {
     <section className="reminders" role="status">
       <div className="row between">
         <div className="reminder-counts">
-          <span className="reminder-icon"><PixelIcon name="bang" size={18} /></span>
+          <span className="reminder-icon"><PixelIcon name="bang" size={24} /></span>
           {items.map((it) => (
             <span key={it.id} className={`reminder-count ${it.id === 'overdue' ? 'overdue' : ''}`}>{it.text}</span>
           ))}
