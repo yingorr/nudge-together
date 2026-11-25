@@ -29,10 +29,10 @@ const ICONS = {
     '..KWK.......',
     '..KK........',
   ],
-  // alarm clock: nudge a friend about an unfinished task
-  alarm: [
-    '.KK.....KK..', 'KKK.KKK.KKK.', 'KK.KWWWK.KK.', '..KWWKWWK...', '.KWWWKWWWK..', '.KWWWKWWWK..',
-    '.KWWWKKKWK..', '.KWWWWWWWK..', '..KWWWWWK...', '...KKKKK....', '..K.....K...', '............',
+  // speech bubble with a red "?": nudge a friend about an unfinished task
+  ask: [
+    '...TTTTTT...', '.TTWWWWWWTT.', 'TWWWXXXXWWWT', 'TWWXXWWXXWWT', 'TWWWWWXXWWWT', 'TWWWWXXWWWWT',
+    'TWWWWWWWWWWT', 'TWWWWXXWWWWT', '.TTWWWWWWTT.', '..TWTTTTTT..', '..TT........', '..T.........',
   ],
   // single paw print: show / hide 宝宝 (drawn in the button's text color)
   paw: ['..TT.TT..', '..TT.TT..', 'TT.....TT', 'TT.TTT.TT', '..TTTTT..', '.TTTTTTT.', '.TTTTTTT.', '.TTT.TTT.'],

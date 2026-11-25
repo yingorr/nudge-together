@@ -42,7 +42,7 @@ export default function NudgeButton({ task, sentRecently, onSent }) {
         title={done ? 'Nudged recently. Tap to send another' : task.completed ? 'Send a cheer' : 'Send a nudge'}
         disabled={status === 'sending'}
       >
-        <PixelIcon name={task.completed ? 'cheer' : 'alarm'} size={22} />
+        <PixelIcon name={task.completed ? 'cheer' : 'ask'} size={22} />
         {done && <span className="nudge-sent-dot" aria-hidden="true" />}
       </button>
       {open && (

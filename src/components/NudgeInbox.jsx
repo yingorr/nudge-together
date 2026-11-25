@@ -37,7 +37,7 @@ export default function NudgeInbox({ userId }) {
   return (
     <section className="nudge-inbox" role="status" aria-live="polite">
       <div className="row between">
-        <strong className="inbox-title"><PixelIcon name="alarm" size={18} /> {nudges.length === 1 ? 'A friend checked in' : `${nudges.length} check-ins from friends`}</strong>
+        <strong className="inbox-title"><PixelIcon name="ask" size={20} /> {nudges.length === 1 ? 'A friend checked in' : `${nudges.length} check-ins from friends`}</strong>
         {nudges.length > 1 && (
           <button className="link small" onClick={() => dismiss(nudges.map((n) => n.id))}>Clear all</button>
         )}
