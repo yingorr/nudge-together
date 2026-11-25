@@ -35,14 +35,11 @@ const ICONS = {
     '.KWWWKKKWK..', '.KWWWWWWWK..', '..KWWWWWK...', '...KKKKK....', '..K.....K...', '............',
   ],
   // single paw print: show / hide 宝宝 (drawn in the button's text color)
-  paw: [
-    '..TT...TT..', '.TTTT.TTTT.', '.TTTT.TTTT.', '..TT...TT..', 'TT.......TT', 'TT..TTT..TT',
-    '...TTTTT...', '..TTTTTTT..', '..TTTTTTT..', '..TTTTTTT..', '...TT.TT...',
-  ],
+  paw: ['..TT.TT..', '..TT.TT..', 'TT.....TT', 'TT.TTT.TT', '..TTTTT..', '.TTTTTTT.', '.TTTTTTT.', '.TTT.TTT.'],
   // exclamation mark: reminder banner
   bang: [
-    '....TTT....', '...TTTTT...', '...TTTTT...', '....TTT....', '....TTT....', '....TTT....',
-    '.....T.....', '...........', '....TTT....', '....TTT....', '...........',
+    '...TTT...', '..TTTTT..', '..TTTTT..', '...TTT...', '...TTT...', '...TTT...',
+    '...TTT...', '.........', '...TTT...', '...TTT...', '...TTT...',
   ],
 }
 // Outline and dots follow the theme's sage (lighter in dark mode); T = current text color.
