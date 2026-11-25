@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { CATEGORIES, categoryLabel } from '../lib/constants'
+import { CATEGORIES, categoryLabel, priorityColor, timeLabel } from '../lib/constants'
+import TimeIcon from './TimeIcon'
 import { formatDue, todayISO } from '../lib/dates'
 import { DEFAULT_DAYS, clampDays, currentStep, daysFor, stepsOf } from '../lib/goals'
 import ConfirmButton from './ConfirmButton'
@@ -108,11 +109,69 @@ function GoalForm({ onCreate }) {
   )
 }
 
+// One step's editor (like editing a task): name, date or days, priority, time.
+function StepEditor({ step, goal, waiting, onSave, onCancel, onDelete }) {
+  const [title, setTitle] = useState(step.title)
+  const [due, setDue] = useState(step.due_date ?? '')
+  const [days, setDays] = useState(daysFor(step, goal))
+  const [priority, setPriority] = useState(step.priority ?? null)
+  const [timeNeeded, setTimeNeeded] = useState(step.time_needed ?? null)
+  const ok = title.trim() && (waiting || due)
+
+  function save(e) {
+    e.preventDefault()
+    if (!ok) return
+    const changes = { title: title.trim(), priority, time_needed: timeNeeded }
+    if (waiting) changes.step_days = clampDays(days)
+    else changes.due_date = due
+    onSave(changes)
+  }
+
+  return (
+    <form className="stack step-editor" onSubmit={save}>
+      <input value={title} maxLength={200} autoFocus aria-label="Step name" onChange={(e) => setTitle(e.target.value)} />
+      <div className="goal-fields">
+        {waiting ? (
+          <label className="field">
+            <span className="field-label">Days</span>
+            <span className="days-input">
+              <input type="number" inputMode="numeric" min="1" max="60" value={days} aria-label="Days after the previous step"
+                onChange={(e) => setDays(e.target.value)} onBlur={(e) => setDays(clampDays(e.target.value))} />
+            </span>
+          </label>
+        ) : (
+          <label className="field">
+            <span className="field-label">Due date</span>
+            <input type="date" className={due ? '' : 'empty'} value={due} required onChange={(e) => setDue(e.target.value)} />
+          </label>
+        )}
+        <div className="field centered" role="group" aria-label="Priority">
+          <span className="field-label">Priority</span>
+          <PriorityPicker value={priority} onChange={setPriority} compact />
+        </div>
+        <div className="field centered" role="group" aria-label="Time needed">
+          <span className="field-label">Time</span>
+          <TimePicker value={timeNeeded} onChange={setTimeNeeded} compact />
+        </div>
+      </div>
+      <div className="row between">
+        <div className="row">
+          <button className="btn primary small" disabled={!ok}>Save</button>
+          <button type="button" className="btn ghost small" onClick={onCancel}>Cancel</button>
+        </div>
+        <ConfirmButton label="Delete" question="Delete step?" className="btn danger small" onConfirm={onDelete} />
+      </div>
+    </form>
+  )
+}
+
 // ---------- one goal ----------
-function GoalCard({ goal, steps, onUpdateTask, onUpdateGoal, onDeleteGoal, onAddStep, onRemoveStep }) {
+function GoalCard({ goal, steps, onUpdateTask, onDeleteTask, onUpdateGoal, onDeleteGoal, onAddStep }) {
   const [newDays, setNewDays] = useState(DEFAULT_DAYS)
   const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState({ title: goal.title })
+  const [editingStep, setEditingStep] = useState(null) // step id
+  const goalDraft = () => ({ title: goal.title, category: goal.category, priority: goal.priority ?? null, time_needed: goal.time_needed ?? null })
+  const [draft, setDraft] = useState(goalDraft)
   const [newStep, setNewStep] = useState('')
 
   const done = steps.filter((s) => s.completed).length
@@ -125,6 +184,13 @@ function GoalCard({ goal, steps, onUpdateTask, onUpdateGoal, onDeleteGoal, onAdd
     onUpdateTask(step.id, { completed, completed_at: completed ? new Date().toISOString() : null })
   }
 
+  function saveGoal(e) {
+    e.preventDefault()
+    if (!draft.title.trim()) return
+    onUpdateGoal(goal.id, { ...draft, title: draft.title.trim() })
+    setEditing(false)
+  }
+
   async function addStep(e) {
     e.preventDefault()
     if (!newStep.trim()) return
@@ -135,9 +201,26 @@ function GoalCard({ goal, steps, onUpdateTask, onUpdateGoal, onDeleteGoal, onAdd
   return (
     <section className={`card stack goal ${finished ? 'finished' : ''}`}>
       {editing ? (
-        <form className="stack" onSubmit={(e) => { e.preventDefault(); if (!draft.title.trim()) return; onUpdateGoal(goal.id, { title: draft.title.trim() }); setEditing(false) }}>
+        <form className="stack" onSubmit={saveGoal}>
           <input value={draft.title} maxLength={200} autoFocus aria-label="Goal name"
             onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
+          <span className="muted small goal-form-note">Changes to category apply to every step; priority and time apply to unfinished steps.</span>
+          <div className="goal-fields">
+            <label className="field">
+              <span className="field-label">Category</span>
+              <select value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })}>
+                {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+            </label>
+            <div className="field centered" role="group" aria-label="Priority">
+              <span className="field-label">Priority</span>
+              <PriorityPicker value={draft.priority} onChange={(v) => setDraft({ ...draft, priority: v })} compact />
+            </div>
+            <div className="field centered" role="group" aria-label="Time needed">
+              <span className="field-label">Time</span>
+              <TimePicker value={draft.time_needed} onChange={(v) => setDraft({ ...draft, time_needed: v })} compact />
+            </div>
+          </div>
           <div className="row between">
             <div className="row">
               <button className="btn primary small" disabled={!draft.title.trim()}>Save</button>
@@ -153,10 +236,17 @@ function GoalCard({ goal, steps, onUpdateTask, onUpdateGoal, onDeleteGoal, onAdd
             <strong className="goal-title">{goal.title}</strong>
             <span className="task-meta">
               <span className={`tag ${goal.category}`}>{categoryLabel(goal.category)}</span>
+              {goal.priority && (
+                <span className="goal-prio" style={{ '--prio': priorityColor(goal.priority) }}>{goal.priority[0].toUpperCase() + goal.priority.slice(1)} priority</span>
+              )}
+              {goal.time_needed && (
+                <span className="time-tag" role="img" aria-label={`${timeLabel(goal.time_needed)} time needed`}>
+                  <TimeIcon level={goal.time_needed} size={13} />
+                </span>
+              )}
             </span>
           </div>
-          <button className="icon-btn" aria-label="Edit goal"
-            onClick={() => { setDraft({ title: goal.title }); setEditing(true) }}>✎</button>
+          <button className="icon-btn" aria-label="Edit goal" onClick={() => { setDraft(goalDraft()); setEditing(true) }}>✎</button>
         </div>
       )}
 
@@ -168,9 +258,20 @@ function GoalCard({ goal, steps, onUpdateTask, onUpdateGoal, onDeleteGoal, onAdd
       <ol className="goal-steps">
         {steps.map((s) => {
           const isCurrent = current?.id === s.id
-          const state = s.completed ? 'done' : isCurrent ? 'current' : s.due_date ? 'current' : 'waiting'
+          const state = s.completed ? 'done' : isCurrent || s.due_date ? 'current' : 'waiting'
+          if (editingStep === s.id) {
+            return (
+              <li key={s.id} className="goal-step editing">
+                <StepEditor step={s} goal={goal} waiting={state === 'waiting'}
+                  onCancel={() => setEditingStep(null)}
+                  onSave={(changes) => { onUpdateTask(s.id, changes); setEditingStep(null) }}
+                  onDelete={() => { onDeleteTask(s.id); setEditingStep(null) }} />
+              </li>
+            )
+          }
+          const days = daysFor(s, goal)
           return (
-            <li key={s.id} className={`goal-step ${state}`}>
+            <li key={s.id} className={`goal-step ${state}`} style={{ '--prio': priorityColor(s.priority) }}>
               {state === 'waiting' ? (
                 <span className="step-marker" aria-hidden="true" />
               ) : (
@@ -179,25 +280,16 @@ function GoalCard({ goal, steps, onUpdateTask, onUpdateGoal, onDeleteGoal, onAdd
               )}
               <div className="step-body">
                 <span className="step-title">{s.title}</span>
-                <span className="muted small">
-                  {s.completed ? 'Done' : s.due_date ? formatDue(s.due_date) : 'Waiting'}
+                <span className="step-meta muted small">
+                  <span>{s.completed ? 'Done' : s.due_date ? formatDue(s.due_date) : `Waiting · ${days} day${days === 1 ? '' : 's'}`}</span>
+                  {s.time_needed && (
+                    <span className="time-tag" role="img" aria-label={`${timeLabel(s.time_needed)} time needed`}>
+                      <TimeIcon level={s.time_needed} size={12} />
+                    </span>
+                  )}
                 </span>
               </div>
-              {state === 'waiting' && (
-                <label className="days-input compact">
-                  <input type="number" inputMode="numeric" min="1" max="60" defaultValue={daysFor(s, goal)}
-                    aria-label={`Days after the previous step for "${s.title}"`}
-                    onBlur={(e) => {
-                      const v = clampDays(e.target.value)
-                      e.target.value = v
-                      if (v !== daysFor(s, goal)) onUpdateTask(s.id, { step_days: v })
-                    }} />
-                  <span>days</span>
-                </label>
-              )}
-              {state === 'waiting' && (
-                <ConfirmButton label="✕" question="Remove?" className="icon-btn" onConfirm={() => onRemoveStep(s.id)} />
-              )}
+              <button className="icon-btn" aria-label={`Edit "${s.title}"`} onClick={() => setEditingStep(s.id)}>✎</button>
             </li>
           )
         })}

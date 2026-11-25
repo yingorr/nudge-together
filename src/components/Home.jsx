@@ -142,9 +142,20 @@ export default function Home({ session }) {
     setGoals((gs) => gs.map((g) => (g.id === id ? { ...g, ...changes } : g)))
     const { error } = await supabase.from('goals').update(changes).eq('id', id)
     if (error) { setError(error.message); loadGoals() }
-    // Keep the steps' category in step with the goal.
-    if (changes.category) {
-      await supabase.from('tasks').update({ category: changes.category }).eq('goal_id', id)
+    // Category applies to every step; priority / time needed to unfinished steps.
+    const old = goals.find((g) => g.id === id)
+    const jobs = []
+    if (changes.category && changes.category !== old?.category)
+      jobs.push(supabase.from('tasks').update({ category: changes.category }).eq('goal_id', id))
+    const stepChanges = {}
+    if ('priority' in changes && changes.priority !== (old?.priority ?? null)) stepChanges.priority = changes.priority
+    if ('time_needed' in changes && changes.time_needed !== (old?.time_needed ?? null)) stepChanges.time_needed = changes.time_needed
+    if (Object.keys(stepChanges).length)
+      jobs.push(supabase.from('tasks').update(stepChanges).eq('goal_id', id).eq('completed', false))
+    if (jobs.length) {
+      const results = await Promise.all(jobs)
+      const failed = results.find((r) => r.error)
+      if (failed) setError(failed.error.message)
       loadTasks()
     }
   }
@@ -171,11 +182,7 @@ export default function Home({ session }) {
     loadTasks()
   }
 
-  async function removeStep(id) {
-    setTasks((ts) => ts.filter((t) => t.id !== id))
-    const { error } = await supabase.from('tasks').delete().eq('id', id)
-    if (error) { setError(error.message); loadTasks() }
-  }
+
 
   // Put the deleted task back exactly as it was (same id, dates, done state).
   async function undoDelete() {
@@ -241,7 +248,7 @@ export default function Home({ session }) {
           onUpdateGoal={updateGoal}
           onDeleteGoal={deleteGoal}
           onAddStep={addStep}
-          onRemoveStep={removeStep}
+          onDeleteTask={deleteTask}
         />
       )}
 
