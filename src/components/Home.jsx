@@ -229,7 +229,7 @@ export default function Home({ session }) {
       <header className="topbar">
         <h1 className="logo"><Logo /></h1>
         <div className="topbar-right">
-          <span className="muted small display-name">{profile?.display_name}</span>
+          <span className="muted small display-name">{profile?.display_name?.trim().split(/\s+/)[0]}</span>
           <button className={`icon-btn pet-toggle ${showPet ? '' : 'off'}`} onClick={() => setShowPet(!showPet)}
             aria-pressed={showPet} aria-label={showPet ? 'Hide the cat' : 'Show the cat'} title={showPet ? 'Hide the cat' : 'Show the cat'}>
             <PixelIcon name="paw" size={14} />
