@@ -35,7 +35,8 @@ function word(text, bold = 1) {
     }))
     x += g[0].length + bold - 1 + GAP
   }
-  return { cells, width: x - GAP }
+  const unique = [...new Set(cells.map((c) => c.join(',')))].map((k) => k.split(',').map(Number))
+  return { cells: unique, width: x - GAP }
 }
 
 function grid(rows, colors, ox = 0, oy = 0) {
