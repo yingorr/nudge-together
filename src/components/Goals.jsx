@@ -290,7 +290,7 @@ function GoalCard({ goal, steps, onUpdateTask, onDeleteTask, onUpdateGoal, onDel
               )}
             </span>
           </div>
-          <button className="icon-btn" aria-label="Edit goal" onClick={() => { setDraft(goalDraft()); setEditing(true) }}>✎</button>
+          <button className="icon-btn" aria-label="Edit goal" onClick={() => { setDraft(goalDraft()); setEditing(true) }}><PixelIcon name="pencil" size={13} /></button>
         </div>
       )}
 
@@ -338,7 +338,7 @@ function GoalCard({ goal, steps, onUpdateTask, onDeleteTask, onUpdateGoal, onDel
                   )}
                 </span>
               </div>
-              <button className="icon-btn" aria-label={`Edit "${s.title}"`} onClick={() => setEditingStep(s.id)}>✎</button>
+              <button className="icon-btn" aria-label={`Edit "${s.title}"`} onClick={() => setEditingStep(s.id)}><PixelIcon name="pencil" size={13} /></button>
             </li>
           ), insertAfter]
         })}

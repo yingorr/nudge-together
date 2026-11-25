@@ -157,3 +157,7 @@ the style of references, not copied from them.
 **It never covers your tasks.** On wide screens 宝宝 stays in the empty space beside
 the task list and passes behind it. On phones it has its own strip at the bottom, and
 the page leaves room for it. It respects the "reduce motion" setting.
+
+## Pixel touches, not a full skin (2026-11-25)
+- Tried a full "soft pixel" skin (stepped corners everywhere); the user preferred the rounded look, so it was reverted.
+- Kept: the dotted pixel line between task sections, the gray pixel pencil for edit, and the pixel pie for "time needed".
