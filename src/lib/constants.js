@@ -4,7 +4,7 @@ export const CATEGORIES = [
   { value: 'work', label: 'Work' },
 ]
 
-// Priority is optional. Each task shows a dot in its priority color.
+// Priority is optional. Each task shows a short bar in its priority color next to the title.
 export const PRIORITIES = [
   { value: 'high', label: 'High', color: '#e3a1a1' },   // soft rose
   { value: 'medium', label: 'Medium', color: '#f3cd5a' }, // clear golden yellow

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 
-// 宝宝 the cat: wanders along the bottom of the screen and eats a treat
-// every time you finish a task. Mood comes from tasks finished in the last 24h.
+// 宝宝 the cat: wanders beside the task list on wide screens (its own strip at the
+// bottom on phones), naps in its bed, sits on its cat tree, and eats a treat every
+// time you finish a task. Mood comes from tasks finished in the last 24h.
 
 const CAT_W = 72
 // ---------- pixel art ----------

@@ -8,15 +8,18 @@ each other accountable with friends.
 ## Features (v1)
 
 - Sign up / log in with email + password and a display name
-- Create, edit, delete tasks with a **name**, **category** (Personal / School / Work),
-  optional **priority** (color bar on the left: rose / golden / green) required **due date** and optional **time needed** (low / medium / high)
-- Checkbox to mark complete; filter by category; hide/show finished tasks
-- In-app reminder banner with counts per section ("2 overdue · 1 due today · 3 this week · 1 next week & after")
-- Overdue tag on unfinished past-due tasks, with an Overdue filter that combines with the category filters
-- Collapsible date sections: Overdue, Today, This week (next 7 days), Next week & after; the Done button switches to a list of finished tasks
+- Create, edit, delete tasks with a **name**, **category** (Personal / School / Work), a required
+  **due date**, optional **priority** (short color bar beside the title: rose / golden / green) and
+  optional **time needed** (quarter / half / full circle for low / medium / high)
+- Round checkmark button to mark a task done; deleting shows an **Undo** bar instead of a pop-up
+- Filters: category, Overdue, and Time needed; the **Done** button switches to a list of finished tasks
+- Same-day tasks are sorted by priority (high first); "Due today / tomorrow / in 2 days" in maroon
+- In-app reminder banner with task counts per section ("2 overdue · 1 due today · 3 this week · 1 next week & after")
+- Overdue tag on unfinished past-due tasks, with an Overdue filter that combines with the other filters
+- Collapsible date sections: Overdue, Today, This week (next 7 days), Next week & after
 - Friends: send requests by email (private lookup, emails aren't listed), accept/decline, remove
-- "Show friends' tasks" switch + dropdown to view a friend's tasks (read-only) with a progress bar
-- 宝宝 the cat: wanders beside the task list (its own strip at the bottom on phones), naps in its bed, eats a treat for every finished task, and gets sleepier or happier based on tasks done in the last 24 hours (tap for stats, 🐾 to hide)
+- Friends' tasks: a collapsible section; tap a friend to see their tasks (read-only) with a progress bar
+- 宝宝 the cat: wanders beside the task list (its own strip at the bottom on phones), naps in its bed, sits on its cat tree, eats a treat for every finished task, and gets sleepier or happier based on tasks done in the last 24 hours (tap for stats, 🐾 to hide)
 - Nudges: on a friend's task, tap the speech bubble to send a quick check-in (or the heart bubble to cheer a finished one); they see it live on their page
 - Live sync across devices (check a task on your phone, it updates on your laptop)
 - Mobile-friendly layout, dark mode
@@ -62,12 +65,17 @@ On iPhone/iPad: open the site in Safari → Share → **Add to Home Screen** for
 
 | Piece | File | What it does |
 |---|---|---|
-| Database + security | `supabase/migrations/` | Tables for profiles, tasks, friendships. Row Level Security means you can only change your own tasks, and only accepted friends can read them. |
+| Database + security | `supabase/migrations/` | Tables for profiles, tasks, friendships and nudges. Row Level Security means you can only change your own tasks, and only accepted friends can read them or nudge you. |
 | Login | `src/components/Auth.jsx` | Email/password sign up & log in via Supabase Auth |
-| Home screen | `src/components/Home.jsx` | Loads your tasks, live sync, friend toggle/dropdown |
-| Tasks | `TaskForm.jsx`, `TaskList.jsx`, `TaskItem.jsx`, `PriorityPicker.jsx` | Add / filter / check off / edit / delete |
-| Reminders | `Reminders.jsx` | Banner for tasks due within 2 days |
-| Friends | `Friends.jsx`, `FriendView.jsx` | Requests and read-only friend task view |
+| Home screen | `src/components/Home.jsx` | Loads your tasks, live sync, delete + undo |
+| Tasks | `TaskForm.jsx`, `TaskFields.jsx`, `TaskList.jsx`, `TaskItem.jsx`, `PriorityPicker.jsx`, `TimePicker.jsx` | Add / filter / sections / check off / edit / delete |
+| Dates | `src/lib/dates.js` | Overdue check, date sections, "Due today/tomorrow/in 2 days" wording |
+| Reminders | `Reminders.jsx` | Banner with task counts per date section |
+| Friends | `Friends.jsx`, `FriendsPanel.jsx`, `FriendView.jsx`, `ConfirmButton.jsx` | Requests, collapsible friends' tasks, in-app Yes/No confirm |
+| Nudges | `NudgeButton.jsx`, `NudgeInbox.jsx`, `PixelIcon.jsx` | Check in on a friend's task; see check-ins from friends |
+| The cat | `Pet.jsx` | 宝宝, its bed and cat tree, moods, feeding |
+
+See [DECISIONS.md](DECISIONS.md) for why things are built the way they are.
 
 **Why is the publishable (anon) key OK to put in the browser?** It only identifies the project. What
 each user may read or write is enforced inside the database by the RLS policies in
@@ -94,4 +102,5 @@ already run, so each runs exactly once.
 
 ## Out of scope for v1
 
-Phone widget, automatic task breakdown, recurring tasks, overdue alerts, push/email notifications.
+Phone widget, automatic task breakdown, recurring tasks, push/email notifications (reminders, overdue
+warnings and nudges are in-app only).
