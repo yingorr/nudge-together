@@ -388,8 +388,9 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color:
 .pet-food { position: absolute; bottom: 0; width: 26px; height: 16px; image-rendering: pixelated; animation: pet-drop 0.45s ease-out; }
 @keyframes pet-drop { from { transform: translateY(-60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-.zzz { position: absolute; left: 30px; top: 8px; font-size: 13px; font-weight: 700; color: var(--muted);
-  animation: pet-zzz 2.4s ease-in-out infinite; }
+.zzz { position: absolute; left: 30px; top: 2px; display: flex; align-items: flex-end; gap: 3px; color: var(--muted);
+  image-rendering: pixelated; animation: pet-zzz 2.4s ease-in-out infinite; }
+.zzz svg { display: block; }
 @keyframes pet-zzz { 0% { transform: translate(0, 0); opacity: 0; } 30% { opacity: 1; } 100% { transform: translate(10px, -18px); opacity: 0; } }
 
 /* one pixel mark pops up over 宝宝 (heart / anger / dizzy) */

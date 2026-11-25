@@ -160,6 +160,16 @@ const MOOD_LINES = {
   happy: 'So full and happy!',
 }
 
+// ---------- sleeping z's ----------
+const Z_ROWS = ['KKKKK', '...K.', '..K..', '.K...', 'KKKKK']
+function PixelZ({ size }) {
+  return (
+    <svg viewBox="0 0 5 5" width={size} height={size} shapeRendering="crispEdges">
+      {pixels(Z_ROWS, { K: 'currentColor' })}
+    </svg>
+  )
+}
+
 // ---------- reactions: one pixel mark that pops up over 宝宝 ----------
 // heart = fed or petted after finishing a task; anger / dizzy = petted with no task done today
 const ANGER = [
@@ -524,7 +534,11 @@ export default function Pet({ treats, feedSignal }) {
             <div className="muted small">{MOOD_LINES[mood]}</div>
           </div>
         )}
-        {asleep && <span className="zzz" aria-hidden="true">z</span>}
+        {asleep && (
+          <span className="zzz" aria-hidden="true">
+            <PixelZ size={9} /><PixelZ size={13} />
+          </span>
+        )}
         {reaction && (
           <span key={reaction.key} className={`grump-wrap ${reaction.kind}`}><Reaction kind={reaction.kind} /></span>
         )}
